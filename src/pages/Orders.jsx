@@ -1,30 +1,35 @@
 import { useState } from "react";
-import {
-  Activity,
-  MapPin,
-  Clock,
-  User,
-  Phone,
-  MessageSquare,
-  RotateCcw,
-  Star,
-  XCircle,
-  CheckCheck,
-} from "lucide-react";
+import { Activity, MapPin, Clock, User, Phone, MessageSquare, RotateCcw, Star, XCircle } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
 import { useOrders } from "../store/OrdersContext";
+import { useAuth } from "../store/AuthContext";
 import { useToast } from "../store/ToastContext";
 
-function reorderPayload(o) {
-  return { type: o.type, title: o.title, provider: o.provider, address: o.address, time: o.time, price: o.price, paid: false };
+function reorderPayload(o, user) {
+  return {
+    type: o.type,
+    title: o.title,
+    patientName: user ? `${user.firstName} ${user.lastName}` : o.patientName,
+    patientAge: user?.age ?? o.patientAge,
+    address: o.address,
+    time: o.time,
+    price: o.price,
+    paid: false,
+  };
 }
 
 function formatSom(n) {
   return `${n.toLocaleString("uz-UZ")} so'm`;
 }
+
+const activeBadge = {
+  yangi: { tone: "info", label: "Qidirilmoqda" },
+  "qabul qilingan": { tone: "info", label: "Rejalashtirildi" },
+  yolda: { tone: "warning", label: "Yo'lda" },
+};
 
 const tabs = [
   { id: "aktiv", label: "Aktiv" },
@@ -34,11 +39,12 @@ const tabs = [
 
 export default function Orders() {
   const [tab, setTab] = useState("aktiv");
-  const { active, completed, cancelled, addOrder, cancelOrder, completeOrder, rateOrder } = useOrders();
+  const { active, completed, cancelled, addOrder, cancelOrder, rateOrder } = useOrders();
+  const { user } = useAuth();
   const { notify } = useToast();
 
   function reorder(o) {
-    addOrder(reorderPayload(o));
+    addOrder(reorderPayload(o, user));
     setTab("aktiv");
     notify(`${o.title} qayta buyurtma qilindi`);
   }
@@ -66,68 +72,73 @@ export default function Orders() {
       <div className="flex flex-col gap-3 px-4">
         {tab === "aktiv" &&
           (active.length ? (
-            active.map((o) => (
-              <Card key={o.id} className="border-neutral-100 border-l-4 border-l-warning">
-                <div className="flex items-center justify-between">
-                  <span className="text-label font-medium text-neutral-400">{o.id}</span>
-                  <Badge tone="warning">Yo'lda</Badge>
-                </div>
-                <h3 className="mt-2 flex items-center gap-1.5 text-base font-semibold text-neutral-900">
-                  <Activity size={15} className="text-warning" /> {o.title}
-                </h3>
-                <div className="mt-2 flex flex-col gap-1 text-sm text-neutral-600">
-                  <span className="flex items-center gap-1.5">
-                    <User size={14} className="text-neutral-400" /> {o.provider}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <MapPin size={14} className="text-neutral-400" /> {o.address}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Clock size={14} className="text-neutral-400" /> {o.time}
-                  </span>
-                </div>
-                <p className="mt-2 text-base font-semibold text-neutral-900">
-                  {formatSom(o.price)}{" "}
-                  <span className="text-xs font-normal text-neutral-400">
-                    ({o.paid ? "to'landi" : "to'lovga tayyor"})
-                  </span>
-                </p>
-                <div className="mt-3 flex gap-2">
-                  <Button
-                    onClick={() => {
-                      completeOrder(o.id);
-                      notify("Xizmat qabul qilindi deb belgilandi");
-                    }}
-                    className="h-10 flex-1 text-sm"
-                  >
-                    <CheckCheck size={14} /> Qabul qildim
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => notify("Xabarlar tez orada mavjud bo'ladi")}
-                    className="h-10 flex-1 text-sm"
-                  >
-                    <MessageSquare size={14} /> Chat
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => notify(`Qo'ng'iroq: +998 90 123-45-67`)}
-                    className="h-10 text-sm"
-                  >
-                    <Phone size={14} />
-                  </Button>
-                </div>
-                <button
-                  onClick={() => {
-                    cancelOrder(o.id);
-                    notify("Buyurtma bekor qilindi");
-                  }}
-                  className="mt-2 text-xs font-medium text-error hover:underline"
+            active.map((o) => {
+              const badge = activeBadge[o.status] ?? activeBadge.yangi;
+              return (
+                <Card
+                  key={o.id}
+                  className={`border-neutral-100 border-l-4 ${o.status === "yolda" ? "border-l-warning" : "border-l-secondary"}`}
                 >
-                  Buyurtmani bekor qilish
-                </button>
-              </Card>
-            ))
+                  <div className="flex items-center justify-between">
+                    <span className="text-label font-medium text-neutral-400">{o.id}</span>
+                    <Badge tone={badge.tone}>{badge.label}</Badge>
+                  </div>
+                  <h3 className="mt-2 flex items-center gap-1.5 text-base font-semibold text-neutral-900">
+                    <Activity size={15} className="text-warning" /> {o.title}
+                  </h3>
+                  <div className="mt-2 flex flex-col gap-1 text-sm text-neutral-600">
+                    {o.provider ? (
+                      <span className="flex items-center gap-1.5">
+                        <User size={14} className="text-neutral-400" /> {o.provider}
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1.5 text-neutral-400">
+                        <User size={14} /> Xizmat ko'rsatuvchi qidirilmoqda...
+                      </span>
+                    )}
+                    <span className="flex items-center gap-1.5">
+                      <MapPin size={14} className="text-neutral-400" /> {o.address}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Clock size={14} className="text-neutral-400" /> {o.time}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-base font-semibold text-neutral-900">
+                    {formatSom(o.price)}{" "}
+                    <span className="text-xs font-normal text-neutral-400">
+                      ({o.paid ? "to'landi" : "to'lovga tayyor"})
+                    </span>
+                  </p>
+                  {o.provider && (
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        variant="secondary"
+                        onClick={() => notify("Xabarlar tez orada mavjud bo'ladi")}
+                        className="h-10 flex-1 text-sm"
+                      >
+                        <MessageSquare size={14} /> Chat
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        onClick={() => notify(`${o.provider} bilan qo'ng'iroq: tez orada mavjud bo'ladi`)}
+                        className="h-10 flex-1 text-sm"
+                      >
+                        <Phone size={14} /> Qo'ng'iroq
+                      </Button>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => {
+                      cancelOrder(o.id);
+                      notify("Buyurtma bekor qilindi");
+                    }}
+                    className="mt-2 text-xs font-medium text-error hover:underline"
+                  >
+                    Buyurtmani bekor qilish
+                  </button>
+                </Card>
+              );
+            })
           ) : (
             <EmptyState text="Aktiv buyurtmalar yo'q" />
           ))}

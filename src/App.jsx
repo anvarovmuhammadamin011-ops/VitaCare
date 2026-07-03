@@ -6,11 +6,20 @@ import Profile from "./pages/Profile";
 import Reimbursement from "./pages/Reimbursement";
 import Services from "./pages/Services";
 import Booking from "./pages/Booking";
+import PharmacistHome from "./pages/PharmacistHome";
+import PharmacistOrders from "./pages/PharmacistOrders";
+import PharmacistDrugs from "./pages/PharmacistDrugs";
+import PharmacistEarnings from "./pages/PharmacistEarnings";
+import DoctorHome from "./pages/DoctorHome";
+import DoctorOrders from "./pages/DoctorOrders";
+import DoctorEarnings from "./pages/DoctorEarnings";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { AuthProvider, useAuth } from "./store/AuthContext";
 import { CityProvider } from "./store/CityContext";
 import { OrdersProvider } from "./store/OrdersContext";
+import { PharmacyProvider } from "./store/PharmacyContext";
+import { DoctorProvider } from "./store/DoctorContext";
 import { ToastProvider } from "./store/ToastContext";
 
 function Gate() {
@@ -22,6 +31,35 @@ function Gate() {
         <Route path="/kirish" element={<Login />} />
         <Route path="/royxatdan-otish" element={<Register />} />
         <Route path="*" element={<Navigate to="/kirish" replace />} />
+      </Routes>
+    );
+  }
+
+  if (user.role === "aptekachi") {
+    return (
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<PharmacistHome />} />
+          <Route path="/buyurtmalar" element={<PharmacistOrders />} />
+          <Route path="/dorilar" element={<PharmacistDrugs />} />
+          <Route path="/pul" element={<PharmacistEarnings />} />
+          <Route path="/profil" element={<Profile />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
+  }
+
+  if (user.role === "doktor") {
+    return (
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<DoctorHome />} />
+          <Route path="/buyurtmalar" element={<DoctorOrders />} />
+          <Route path="/pul" element={<DoctorEarnings />} />
+          <Route path="/profil" element={<Profile />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
   }
@@ -46,11 +84,15 @@ export default function App() {
     <AuthProvider>
       <CityProvider>
         <OrdersProvider>
-          <ToastProvider>
-            <BrowserRouter>
-              <Gate />
-            </BrowserRouter>
-          </ToastProvider>
+          <PharmacyProvider>
+            <DoctorProvider>
+              <ToastProvider>
+                <BrowserRouter>
+                  <Gate />
+                </BrowserRouter>
+              </ToastProvider>
+            </DoctorProvider>
+          </PharmacyProvider>
         </OrdersProvider>
       </CityProvider>
     </AuthProvider>

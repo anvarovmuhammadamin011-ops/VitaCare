@@ -1,15 +1,21 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ChevronRight, ArrowRight, ShieldCheck } from "lucide-react";
+import { Search, ChevronRight, ChevronDown, ArrowRight, Bell, MapPin, ShieldCheck } from "lucide-react";
 import Wordmark from "../components/Wordmark";
 import ServiceIcon from "../components/ServiceIcon";
 import ServiceDetailSheet from "../components/ServiceDetailSheet";
+import LocationSheet from "../components/LocationSheet";
+import { useCity } from "../store/CityContext";
+import { useToast } from "../store/ToastContext";
 import { quickServices } from "../data/mockData";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { city } = useCity();
+  const { notify } = useToast();
   const [search, setSearch] = useState("");
   const [detailService, setDetailService] = useState(null);
+  const [locationOpen, setLocationOpen] = useState(false);
 
   const filteredServices = useMemo(
     () => quickServices.filter((s) => s.name.toLowerCase().includes(search.toLowerCase())),
@@ -20,10 +26,43 @@ export default function Home() {
     <div className="flex flex-col gap-9 pb-6">
       {/* HEADER */}
       <header className="px-4 pb-2 pt-6">
-        <Wordmark />
+        <div className="flex items-center justify-between">
+          <Wordmark className="h-8 w-auto" />
+          <button
+            onClick={() => notify("Notifikatsiyalar: tez orada qo'shiladi")}
+            aria-label="Notifikatsiyalar"
+            className="grid h-9 w-9 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"
+          >
+            <Bell size={20} />
+          </button>
+        </div>
 
-        <h1 className="mt-6 text-h2 font-bold text-neutral-900">Assalomu alaykum 👋</h1>
-        <p className="mt-1 text-small text-neutral-500">Bugun qanday yordam kerak?</p>
+        <button
+          onClick={() => setLocationOpen(true)}
+          className="mt-3 flex items-center gap-1 text-sm font-semibold text-neutral-700"
+        >
+          <MapPin size={15} className="text-primary" />
+          {city}
+          <ChevronDown size={15} className="text-neutral-400" />
+        </button>
+
+        {/* Hero banner */}
+        <div className="relative mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-5 text-white shadow-md">
+          <div className="max-w-[62%]">
+            <h2 className="text-lg font-bold leading-snug">Hamshira xizmati endilikda bir qadam yaqin!</h2>
+            <p className="mt-1 text-small text-white/80">Tez, ishonchli va qulay</p>
+            <button
+              onClick={() => navigate("/band-qilish/umumiy-hamshira")}
+              aria-label="Band qilish"
+              className="mt-4 grid h-10 w-10 place-items-center rounded-full bg-white text-primary-dark transition hover:bg-white/90"
+            >
+              <ArrowRight size={18} />
+            </button>
+          </div>
+          <span className="pointer-events-none absolute -right-3 bottom-0 select-none text-[100px] leading-none">
+            🧑‍⚕️
+          </span>
+        </div>
 
         {/* Search */}
         <div className="relative mt-5">
@@ -35,15 +74,6 @@ export default function Home() {
             className="h-12 w-full rounded-xl border border-neutral-200 bg-white pl-11 pr-4 text-body text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
-
-        {/* CTA */}
-        <button
-          onClick={() => navigate("/buyurtmalar")}
-          className="mt-3 flex h-12 w-full items-center justify-center gap-1.5 rounded-xl bg-primary text-sm font-semibold text-white hover:bg-primary-dark"
-        >
-          Buyurtmalar
-          <ArrowRight size={16} />
-        </button>
       </header>
 
       {/* TEZKOR XIZMATLAR */}
@@ -102,6 +132,7 @@ export default function Home() {
         onClose={() => setDetailService(null)}
         onBook={(s) => navigate(`/band-qilish/${s.id}`)}
       />
+      <LocationSheet open={locationOpen} onClose={() => setLocationOpen(false)} />
     </div>
   );
 }

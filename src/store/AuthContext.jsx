@@ -63,9 +63,13 @@ export function AuthProvider({ children }) {
     setPending(null);
   }
 
+  function markVerified() {
+    setAccounts((cur) => cur.map((a) => (a.phone === sessionPhone ? { ...a, verified: true } : a)));
+  }
+
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, startRegistration, resendOtp, verifyOtp, cancelRegistration }}
+      value={{ user, login, logout, startRegistration, resendOtp, verifyOtp, cancelRegistration, markVerified }}
     >
       {children}
     </AuthContext.Provider>

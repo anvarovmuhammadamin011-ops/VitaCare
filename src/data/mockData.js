@@ -99,9 +99,11 @@ export const seedOrders = [
   {
     id: "BUY-2026-001",
     type: "service",
-    status: "active",
+    status: "qabul qilingan",
     title: "Qon olish",
     provider: "Dr. Alisher Karimov",
+    patientName: "Dilyora Sultanova",
+    patientAge: 34,
     address: "Mirobod ko'ch., 15/A, Kv.25",
     time: "Bugun 14:00-15:00",
     price: 50000,
@@ -110,9 +112,11 @@ export const seedOrders = [
   {
     id: "BUY-2025-500",
     type: "service",
-    status: "completed",
+    status: "tugallandi",
     title: "EKG",
     provider: "Feruza Zainab",
+    patientName: "Dilyora Sultanova",
+    patientAge: 34,
     address: "Chilonzor, 25/3, Kv.10",
     time: "2026-06-10 09:00-09:30",
     price: 75000,
@@ -121,24 +125,229 @@ export const seedOrders = [
   {
     id: "BUY-2025-388",
     type: "service",
-    status: "cancelled",
+    status: "bekor qilindi",
     title: "Ultratovush",
     provider: "Dr. Nodira Yusupova",
+    patientName: "Dilyora Sultanova",
+    patientAge: 34,
     address: "Yunusobod, 8, Kv.44",
     time: "2026-04-02 10:00-10:30",
     price: 120000,
     reason: "Foydalanuvchi tomonidan bekor qilindi",
   },
-];
-
-export const providers = [
-  { id: "karimov", name: "Dr. Alisher Karimov", rating: 4.9, specialty: "Terapevt" },
-  { id: "zainab", name: "Feruza Zainab", rating: 4.8, specialty: "Hamshira" },
+  // Demo marketplace flavor: other patients' orders, visible in any doctor's shared queue
+  // but not in a freshly-registered patient's own order history (matched by patient name).
+  {
+    id: "1234",
+    type: "service",
+    status: "yangi",
+    title: "Qon olish",
+    patientName: "Dilyora S.",
+    patientAge: 42,
+    address: "Mirobod ko'chasi, 15/A, Kv.25",
+    time: "Bugun 14:00",
+    price: 50000,
+    note: "Allergiya: Penitsillin",
+  },
+  {
+    id: "1235",
+    type: "service",
+    status: "yangi",
+    title: "EKG",
+    patientName: "Ahmad K.",
+    patientAge: 55,
+    address: "Yunusobod, 45/12, Kv.3",
+    time: "Bugun 15:30",
+    price: 75000,
+  },
+  {
+    id: "1233",
+    type: "service",
+    status: "yolda",
+    title: "EKG",
+    provider: "Dr. Alisher Karimov",
+    patientName: "Malika T.",
+    patientAge: 34,
+    address: "Chilonzor, 8-uy",
+    time: "Bugun 13:00",
+    price: 75000,
+  },
+  {
+    id: "1230",
+    type: "service",
+    status: "qabul qilingan",
+    title: "Qon olish",
+    provider: "Dr. Alisher Karimov",
+    patientName: "Sardor N.",
+    patientAge: 29,
+    address: "Sergeli, 22-uy",
+    time: "Bugun 16:00",
+    price: 50000,
+  },
+  {
+    id: "1232",
+    type: "service",
+    status: "tugallandi",
+    title: "Qon olish",
+    provider: "Dr. Alisher Karimov",
+    patientName: "Fatima X.",
+    patientAge: 61,
+    address: "Mirzo Ulug'bek, 5-uy",
+    time: "2 soat oldin",
+    price: 50000,
+    rating: 5,
+    comment: "Juda malakali, tez qildi!",
+  },
+  {
+    id: "1228",
+    type: "service",
+    status: "tugallandi",
+    title: "Ultratovush",
+    provider: "Dr. Alisher Karimov",
+    patientName: "Jasur B.",
+    patientAge: 38,
+    address: "Olmazor, 14-uy",
+    time: "Kecha",
+    price: 100000,
+    rating: 5,
+    comment: "Professional yondashuv",
+  },
+  {
+    id: "1220",
+    type: "service",
+    status: "bekor qilindi",
+    title: "EKG",
+    patientName: "Zarina Q.",
+    patientAge: 47,
+    address: "Bektemir, 3-uy",
+    time: "3 kun oldin",
+    price: 75000,
+    reason: "Doktor tomonidan bekor qilindi",
+  },
 ];
 
 export const pharmacies = [
   { id: "green", name: "Green Pharmacy", city: "Toshkent" },
   { id: "healthplus", name: "Health+ Drugs", city: "Andijon" },
+];
+
+export const seedPayouts = [
+  { date: "2026-06-16", amount: 5000000 },
+  { date: "2026-06-10", amount: 3500000 },
+  { date: "2026-06-05", amount: 4200000 },
+  { date: "2026-06-01", amount: 2800000 },
+];
+
+export const DOCTOR_COMMISSION_RATE = 0.03;
+
+// Categories offered when a pharmacist adds a drug to their inventory.
+export const drugCategories = ["Og'riq qoldiruvchi", "Antibiotik", "Vitamin", "Sovuqotish", "Boshqa"];
+
+export const PHARMACY_COMMISSION_RATE = 0.05;
+
+export const deliveryFleet = ["Javohir (Motosikl)", "Akmal (Velosiped)", "Olimjon (Motosikl)"];
+
+// Incoming (prescription or plain) drug orders a pharmacist (Aptekachi account) fulfills.
+export const seedPharmacyOrders = [
+  {
+    id: "5001",
+    status: "yangi",
+    hasPrescription: true,
+    patientName: "Dilyora S.",
+    patientAge: 42,
+    items: [
+      { name: "Aspirin 500mg", qty: 30 },
+      { name: "Amoxicillin 250mg", qty: 20 },
+      { name: "Vitamin C 1000mg", qty: 60 },
+    ],
+    total: 125000,
+    address: "Mirobod ko'chasi, 15/A, Kv.25, Toshkent",
+    phone: "+998 90 123-45-67",
+    documentRequired: false,
+    time: "Bugun 10:12",
+  },
+  {
+    id: "5002",
+    status: "yangi",
+    hasPrescription: true,
+    patientName: "Ahmad K.",
+    patientAge: 55,
+    items: [
+      { name: "Metformin 500mg", qty: 60 },
+      { name: "Glukometr", qty: 1 },
+    ],
+    total: 85000,
+    address: "Chilonzor, 25/3, Kv.10",
+    phone: "+998 91 222-33-44",
+    documentRequired: true,
+    time: "Bugun 10:40",
+  },
+  {
+    id: "5000",
+    status: "yolda",
+    hasPrescription: false,
+    patientName: "Fatima X.",
+    patientAge: 47,
+    items: [{ name: "Paracetamol 500mg", qty: 2 }],
+    total: 18000,
+    address: "Yunusobod, 45-uy",
+    phone: "+998 93 444-55-66",
+    documentRequired: false,
+    deliveryBoy: "Akmal (Velosiped)",
+    eta: "10 minut",
+    time: "Bugun 09:20",
+  },
+  {
+    id: "4998",
+    status: "tayyorlanmoqda",
+    hasPrescription: true,
+    patientName: "Sardor N.",
+    patientAge: 29,
+    items: [{ name: "Ibuprofen 200mg", qty: 1 }],
+    total: 24000,
+    address: "Sergeli, 22-uy",
+    phone: "+998 94 555-66-77",
+    documentRequired: false,
+    time: "Bugun 08:50",
+  },
+  {
+    id: "4999",
+    status: "tugallandi",
+    hasPrescription: false,
+    patientName: "Hassan A.",
+    patientAge: 38,
+    items: [
+      { name: "Vitamin C 1000mg", qty: 3 },
+      { name: "Paracetamol 500mg", qty: 2 },
+    ],
+    total: 45000,
+    address: "Mirzo Ulug'bek, 5-uy",
+    phone: "+998 95 666-77-88",
+    deliveryBoy: "Olimjon (Motosikl)",
+    time: "Kecha",
+    rating: 5,
+    comment: "Tez, qulay, dorilar to'g'ri edi!",
+  },
+  {
+    id: "4990",
+    status: "bekor qilindi",
+    hasPrescription: true,
+    patientName: "Zarina Q.",
+    patientAge: 51,
+    items: [{ name: "Amoksitsillin 500mg", qty: 1 }],
+    total: 32000,
+    address: "Bektemir, 3-uy",
+    phone: "+998 97 777-88-99",
+    reason: "Dori qoldig'i yo'q",
+    time: "3 kun oldin",
+  },
+];
+
+export const seedPharmacyPayouts = [
+  { date: "2026-06-16", amount: 15000000 },
+  { date: "2026-06-10", amount: 12500000 },
+  { date: "2026-06-05", amount: 11250000 },
+  { date: "2026-06-01", amount: 8000000 },
 ];
 
 export const userProfile = {
@@ -154,8 +363,8 @@ export const userProfile = {
     { label: "Ota-onasining uyi", detail: "Chilonzor, 12, Kv.7", primary: false },
   ],
   cards: [
-    { label: "Humo", number: "9860 **** **** 1234", primary: true },
-    { label: "Visa", number: "4000 **** **** 5678", primary: false },
+    { label: "Humo", number: "9860 **** **** 1234", fullNumber: "9860 3421 7788 1234", primary: true },
+    { label: "Visa", number: "4000 **** **** 5678", fullNumber: "4000 1122 3344 5678", primary: false },
   ],
   ratingAvg: 4.8,
   reviewCount: 12,

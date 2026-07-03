@@ -4,8 +4,9 @@ import { ArrowLeft, Map, MapPin } from "lucide-react";
 import Button from "../components/ui/Button";
 import MapPickerSheet from "../components/MapPickerSheet";
 import { useOrders } from "../store/OrdersContext";
+import { useAuth } from "../store/AuthContext";
 import { useToast } from "../store/ToastContext";
-import { careServices, providers, quickServices, userProfile } from "../data/mockData";
+import { careServices, quickServices, userProfile } from "../data/mockData";
 
 const timeSlots = ["09:00-10:00", "11:00-12:00", "14:00-15:00", "16:00-17:00", "18:00-19:00"];
 
@@ -17,6 +18,7 @@ export default function Booking() {
   const { serviceId } = useParams();
   const navigate = useNavigate();
   const { addOrder } = useOrders();
+  const { user } = useAuth();
   const { notify } = useToast();
 
   const service = useMemo(
@@ -43,17 +45,17 @@ export default function Booking() {
   }
 
   function handleConfirm() {
-    const provider = providers[Math.floor(Math.random() * providers.length)];
     addOrder({
       type: "service",
       title: service.name,
-      provider: provider.name,
+      patientName: user ? `${user.firstName} ${user.lastName}` : undefined,
+      patientAge: user?.age,
       address,
       time: `${date} ${slot}`,
       price: service.price,
       paid: false,
     });
-    notify(`${service.name} buyurtma qilindi — Buyurtmalar bo'limidan kuzating`);
+    notify(`${service.name} buyurtma qilindi — xizmat ko'rsatuvchi qidirilmoqda`);
     navigate("/buyurtmalar");
   }
 

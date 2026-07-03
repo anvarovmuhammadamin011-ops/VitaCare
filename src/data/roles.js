@@ -19,3 +19,27 @@ export const accountRoles = [
     icon: "Stethoscope",
   },
 ];
+
+// Suggested chips shown when a Doktor account picks their specialization.
+export const doctorSpecialties = [
+  "Terapevt",
+  "Stomatolog",
+  "Pediatr",
+  "Kardiolog",
+  "Ginekolog",
+  "Nevropatolog",
+  "LOR",
+  "Dermatolog",
+];
+
+// Suggested chips shown when a Doktor account picks their service city.
+export const majorCities = [
+  "Toshkent",
+  "Andijon",
+  "Namangan",
+  "Farg'ona",
+  "Samarqand",
+  "Buxoro",
+  "Guliston",
+  "Nukus",
+];

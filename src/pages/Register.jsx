@@ -1,12 +1,25 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Pill, Stethoscope, UserRound, Check, MessageSquareText } from "lucide-react";
+import {
+  ArrowLeft,
+  Map,
+  MapPin,
+  Pill as PillIcon,
+  Stethoscope,
+  Upload,
+  UserRound,
+  Check,
+  MessageSquareText,
+} from "lucide-react";
 import Button from "../components/ui/Button";
+import Pill from "../components/ui/Pill";
+import MapPickerSheet from "../components/MapPickerSheet";
 import { useToast } from "../store/ToastContext";
 import { useAuth } from "../store/AuthContext";
-import { accountRoles } from "../data/roles";
+import { accountRoles, doctorSpecialties, majorCities } from "../data/roles";
+import { PHONE_PREFIX, formatPhoneLocal } from "../utils/phone";
 
-const roleIcons = { Pill, Stethoscope, UserRound };
+const roleIcons = { Pill: PillIcon, Stethoscope, UserRound };
 
 const inputClass =
   "mt-1 h-12 w-full rounded-xl border border-neutral-200 px-3 text-body focus:outline-none focus:ring-2 focus:ring-primary";
@@ -27,6 +40,14 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState(null);
+  const [specialty, setSpecialty] = useState("");
+  const [experienceYears, setExperienceYears] = useState("");
+  const [serviceCity, setServiceCity] = useState("");
+  const [certificateFileName, setCertificateFileName] = useState("");
+  const [bankCard, setBankCard] = useState("");
+  const [pharmacyName, setPharmacyName] = useState("");
+  const [pharmacyAddress, setPharmacyAddress] = useState("");
+  const [mapOpen, setMapOpen] = useState(false);
 
   function handleDetailsSubmit(e) {
     e.preventDefault();
@@ -59,14 +80,52 @@ export default function Register() {
       notify("Yo'nalishni tanlang: Foydalanuvchi, Aptekachi yoki Doktor");
       return;
     }
+    if (role === "doktor" && !specialty.trim()) {
+      notify("Yo'nalishingizni kiriting, masalan: Stomatolog");
+      return;
+    }
+    if (role === "doktor" && (!experienceYears || !serviceCity.trim() || !certificateFileName || !bankCard.trim())) {
+      notify("Tajriba, shahar, sertifikat va bank kartangizni to'ldiring");
+      return;
+    }
+    if (
+      role === "aptekachi" &&
+      (!pharmacyName.trim() || !pharmacyAddress.trim() || !certificateFileName || !bankCard.trim())
+    ) {
+      notify("Apteka nomi, manzili, litsenziya va bank kartangizni to'ldiring");
+      return;
+    }
+
+    const extra =
+      role === "doktor"
+        ? {
+            specialty: specialty.trim(),
+            experienceYears: Number(experienceYears),
+            serviceCity,
+            certificateFileName,
+            bankCard: bankCard.trim(),
+            verified: false,
+          }
+        : role === "aptekachi"
+          ? {
+              pharmacyName: pharmacyName.trim(),
+              pharmacyAddress: pharmacyAddress.trim(),
+              certificateFileName,
+              bankCard: bankCard.trim(),
+              verified: false,
+            }
+          : {};
+
+    const fullPhone = `${PHONE_PREFIX} ${phone}`;
 
     const res = startRegistration({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       age: Number(age),
-      phone: phone.trim(),
+      phone: fullPhone,
       password,
       role,
+      ...extra,
       createdAt: new Date().toISOString(),
     });
 
@@ -75,7 +134,7 @@ export default function Register() {
       return;
     }
 
-    notify(`SMS kod ${phone} raqamiga yuborildi (test uchun): ${res.otp}`);
+    notify(`SMS kod ${fullPhone} raqamiga yuborildi (test uchun): ${res.otp}`);
     setStep("otp");
   }
 
@@ -90,7 +149,8 @@ export default function Register() {
       notify(res.error);
       return;
     }
-    notify("Hisob tasdiqlandi — xush kelibsiz!");
+
+    if (role !== "doktor" && role !== "aptekachi") notify("Hisob tasdiqlandi — xush kelibsiz!");
     navigate("/");
   }
 
@@ -120,7 +180,7 @@ export default function Register() {
             <MessageSquareText size={24} />
           </span>
           <h1 className="text-h2 font-bold text-neutral-900">Kodni tasdiqlang</h1>
-          <p className="text-small text-neutral-500">{phone} raqamiga yuborilgan 4 xonali kodni kiriting</p>
+          <p className="text-small text-neutral-500">{PHONE_PREFIX} {phone} raqamiga yuborilgan 4 xonali kodni kiriting</p>
         </div>
 
         <form onSubmit={handleOtpSubmit} className="flex flex-col gap-4">
@@ -193,10 +253,143 @@ export default function Register() {
             })}
           </div>
 
+          {role === "doktor" && (
+            <>
+              <div>
+                <label className={labelClass}>Yo'nalishingiz</label>
+                <input
+                  value={specialty}
+                  onChange={(e) => setSpecialty(e.target.value)}
+                  placeholder="Masalan: Stomatolog"
+                  className={inputClass}
+                />
+                <div className="no-scrollbar mt-2 flex gap-2 overflow-x-auto pb-1">
+                  {doctorSpecialties.map((s) => (
+                    <Pill key={s} active={specialty === s} onClick={() => setSpecialty(s)} type="button">
+                      {s}
+                    </Pill>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Tajriba (necha yil)</label>
+                <input
+                  type="number"
+                  value={experienceYears}
+                  onChange={(e) => setExperienceYears(e.target.value)}
+                  placeholder="Masalan: 10"
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label className={labelClass}>Xizmat ko'rsatish shahri</label>
+                <input
+                  value={serviceCity}
+                  onChange={(e) => setServiceCity(e.target.value)}
+                  placeholder="Masalan: Toshkent"
+                  className={inputClass}
+                />
+                <div className="no-scrollbar mt-2 flex gap-2 overflow-x-auto pb-1">
+                  {majorCities.map((c) => (
+                    <Pill key={c} active={serviceCity === c} onClick={() => setServiceCity(c)} type="button">
+                      {c}
+                    </Pill>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Sertifikat</label>
+                <label className="mt-1 flex h-12 w-full cursor-pointer items-center gap-2 rounded-xl border border-dashed border-neutral-200 px-3 text-sm text-neutral-500 hover:border-primary/40">
+                  <Upload size={16} className="shrink-0 text-neutral-400" />
+                  <span className="min-w-0 flex-1 truncate">
+                    {certificateFileName || "Fayl tanlash (JPG, PNG yoki PDF)"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*,.pdf"
+                    onChange={(e) => setCertificateFileName(e.target.files?.[0]?.name ?? "")}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              <div>
+                <label className={labelClass}>Bank karta raqami (pul qaytarish uchun)</label>
+                <input
+                  value={bankCard}
+                  onChange={(e) => setBankCard(e.target.value)}
+                  placeholder="9860 1234 5678 1234"
+                  className={inputClass}
+                />
+              </div>
+            </>
+          )}
+
+          {role === "aptekachi" && (
+            <>
+              <div>
+                <label className={labelClass}>Apteka nomi</label>
+                <input
+                  value={pharmacyName}
+                  onChange={(e) => setPharmacyName(e.target.value)}
+                  placeholder="Masalan: Green Pharmacy"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Apteka manzili</label>
+                <button
+                  type="button"
+                  onClick={() => setMapOpen(true)}
+                  className="mt-1 flex w-full items-start gap-2 rounded-xl border border-neutral-200 p-3 text-left text-sm hover:border-primary/40"
+                >
+                  <MapPin size={16} className="mt-0.5 shrink-0 text-primary" />
+                  <span className="flex-1 text-neutral-800">
+                    {pharmacyAddress || "Manzilni xaritadan tanlang"}
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-primary">
+                    <Map size={14} /> Xaritadan
+                  </span>
+                </button>
+              </div>
+
+              <div>
+                <label className={labelClass}>Apteka litsenziyasi</label>
+                <label className="mt-1 flex h-12 w-full cursor-pointer items-center gap-2 rounded-xl border border-dashed border-neutral-200 px-3 text-sm text-neutral-500 hover:border-primary/40">
+                  <Upload size={16} className="shrink-0 text-neutral-400" />
+                  <span className="min-w-0 flex-1 truncate">
+                    {certificateFileName || "Fayl tanlash (JPG, PNG yoki PDF)"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*,.pdf"
+                    onChange={(e) => setCertificateFileName(e.target.files?.[0]?.name ?? "")}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              <div>
+                <label className={labelClass}>Bank karta raqami (pul qaytarish uchun)</label>
+                <input
+                  value={bankCard}
+                  onChange={(e) => setBankCard(e.target.value)}
+                  placeholder="9860 1234 5678 1234"
+                  className={inputClass}
+                />
+              </div>
+            </>
+          )}
+
           <Button type="submit" className="w-full justify-center">
             Davom etish
           </Button>
         </form>
+
+        <MapPickerSheet open={mapOpen} onClose={() => setMapOpen(false)} onConfirm={setPharmacyAddress} />
       </div>
     );
   }
@@ -239,13 +432,17 @@ export default function Register() {
 
         <div>
           <label className={labelClass}>Telefon raqami</label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+998 90 123-45-67"
-            className={inputClass}
-          />
+          <div className="mt-1 flex h-12 w-full items-center gap-1.5 rounded-xl border border-neutral-200 px-3 focus-within:ring-2 focus-within:ring-primary">
+            <span className="shrink-0 text-body text-neutral-500">{PHONE_PREFIX}</span>
+            <input
+              type="tel"
+              inputMode="numeric"
+              value={phone}
+              onChange={(e) => setPhone(formatPhoneLocal(e.target.value))}
+              placeholder="90 123-45-67"
+              className="w-full min-w-0 bg-transparent text-body focus:outline-none"
+            />
+          </div>
         </div>
 
         <div>

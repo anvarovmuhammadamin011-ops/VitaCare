@@ -5,6 +5,7 @@ import Button from "../components/ui/Button";
 import Wordmark from "../components/Wordmark";
 import { useAuth } from "../store/AuthContext";
 import { useToast } from "../store/ToastContext";
+import { PHONE_PREFIX, formatPhoneLocal } from "../utils/phone";
 
 const inputClass =
   "mt-1 h-12 w-full rounded-xl border border-neutral-200 px-3 text-body focus:outline-none focus:ring-2 focus:ring-primary";
@@ -23,7 +24,7 @@ export default function Login() {
       notify("Telefon raqami va parolni kiriting");
       return;
     }
-    const res = login(phone, password);
+    const res = login(`${PHONE_PREFIX} ${phone}`, password);
     if (!res.ok) {
       notify(res.error);
       return;
@@ -41,13 +42,17 @@ export default function Login() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className={labelClass}>Telefon raqami</label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+998 90 123-45-67"
-            className={inputClass}
-          />
+          <div className="mt-1 flex h-12 w-full items-center gap-1.5 rounded-xl border border-neutral-200 px-3 focus-within:ring-2 focus-within:ring-primary">
+            <span className="shrink-0 text-body text-neutral-500">{PHONE_PREFIX}</span>
+            <input
+              type="tel"
+              inputMode="numeric"
+              value={phone}
+              onChange={(e) => setPhone(formatPhoneLocal(e.target.value))}
+              placeholder="90 123-45-67"
+              className="w-full min-w-0 bg-transparent text-body focus:outline-none"
+            />
+          </div>
         </div>
         <div>
           <label className={labelClass}>Parol</label>
