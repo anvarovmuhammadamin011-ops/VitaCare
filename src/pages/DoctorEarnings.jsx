@@ -5,6 +5,7 @@ import StatsPanel from "../components/StatsPanel";
 import { Check, Wallet } from "lucide-react";
 import { useDoctor } from "../store/DoctorContext";
 import { useToast } from "../store/ToastContext";
+import { usePlatformSettings } from "../store/PlatformSettingsContext";
 
 function formatSom(n) {
   return `${n.toLocaleString("uz-UZ")} so'm`;
@@ -13,6 +14,7 @@ function formatSom(n) {
 export default function DoctorEarnings() {
   const { grossEarnings, commission, netEarnings, completed, payouts, avgRating, reviewCount } = useDoctor();
   const { notify } = useToast();
+  const { settings } = usePlatformSettings();
 
   const byService = completed.reduce((acc, o) => {
     const label = o.items ? o.items.map((item) => item.title).join(" + ") : o.title;
@@ -47,7 +49,7 @@ export default function DoctorEarnings() {
           </h2>
           <dl className="mt-3 flex flex-col gap-2 text-sm">
             <Row label="Jami" value={formatSom(grossEarnings)} />
-            <Row label="Komissiya (3%)" value={`-${formatSom(commission)}`} muted />
+            <Row label={`Komissiya (${Math.round(settings.commission.doctor * 100)}%)`} value={`-${formatSom(commission)}`} muted />
             <Row label="Sof pul" value={formatSom(netEarnings)} bold />
           </dl>
           <Button onClick={() => notify("To'lov so'rovi: tez orada mavjud bo'ladi")} className="mt-3 h-10 w-full text-sm">

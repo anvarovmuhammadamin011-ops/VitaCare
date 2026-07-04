@@ -48,6 +48,16 @@ const DEMO_ACCOUNTS = {
     bankCard: "9860 1234 5678 0003",
     verified: true,
   },
+  admin: {
+    phone: "+998 90 000-00-04",
+    password: "demo123",
+    firstName: "Test",
+    lastName: "Admin",
+    age: 33,
+    role: "admin",
+    adminLevel: "super",
+    verified: true,
+  },
 };
 
 export function AuthProvider({ children }) {
@@ -64,6 +74,7 @@ export function AuthProvider({ children }) {
     const normalized = phone.trim();
     const found = accounts.find((a) => a.phone === normalized && a.password === password);
     if (!found) return { ok: false, error: "Telefon raqami yoki parol noto'g'ri" };
+    if (found.suspended) return { ok: false, error: "Hisobingiz vaqtincha to'xtatilgan. Qo'llab-quvvatlash xizmatiga murojaat qiling" };
     setSessionPhone(found.phone);
     return { ok: true };
   }
@@ -139,6 +150,21 @@ export function AuthProvider({ children }) {
     return () => clearInterval(interval);
   }, [accounts, sessionPhone]);
 
+  // Admin-scoped actions operate on an arbitrary account by phone (the admin isn't
+  // logged in as that account), unlike the session-scoped functions above.
+  function adminSetVerified(phone, verified) {
+    setAccounts((cur) => cur.map((a) => (a.phone === phone ? { ...a, verified } : a)));
+  }
+
+  function adminSetSuspended(phone, suspended) {
+    setAccounts((cur) => cur.map((a) => (a.phone === phone ? { ...a, suspended } : a)));
+  }
+
+  function adminDeleteAccount(phone) {
+    setAccounts((cur) => cur.filter((a) => a.phone !== phone));
+    if (sessionPhone === phone) setSessionPhone(null);
+  }
+
   function quickLogin(role) {
     const template = DEMO_ACCOUNTS[role];
     if (!template) return;
@@ -164,6 +190,9 @@ export function AuthProvider({ children }) {
         updateProfile,
         requestAccountDeletion,
         cancelAccountDeletion,
+        adminSetVerified,
+        adminSetSuspended,
+        adminDeleteAccount,
         quickLogin,
       }}
     >

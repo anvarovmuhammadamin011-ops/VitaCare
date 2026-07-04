@@ -16,6 +16,8 @@ import NotificationBell from "../components/NotificationBell";
 import ServiceIcon from "../components/ServiceIcon";
 import ServiceDetailSheet from "../components/ServiceDetailSheet";
 import LocationSheet from "../components/LocationSheet";
+import BloodPressureCheck from "../components/BloodPressureCheck";
+import Sheet from "../components/ui/Sheet";
 import { useCity } from "../store/CityContext";
 import { useReminders } from "../store/RemindersContext";
 import { quickServices } from "../data/mockData";
@@ -27,6 +29,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [detailService, setDetailService] = useState(null);
   const [locationOpen, setLocationOpen] = useState(false);
+  const [bpOpen, setBpOpen] = useState(false);
 
   const filteredServices = useMemo(
     () => quickServices.filter((s) => s.name.toLowerCase().includes(search.toLowerCase())),
@@ -150,6 +153,20 @@ export default function Home() {
       {/* TEZKOR HAVOLALAR */}
       <section className="flex flex-col gap-3 px-4">
         <button
+          onClick={() => setBpOpen(true)}
+          className="flex w-full items-center gap-4 rounded-card border border-error/20 bg-error/5 p-4 text-left transition hover:border-error/40 hover:bg-error/10 active:scale-[0.99]"
+        >
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-error text-white">
+            <HeartPulse size={22} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-base font-bold text-neutral-900">Qon bosimini o'lchash</span>
+            <span className="block text-small text-neutral-500">Bepul — ilova ichida, bir necha soniyada</span>
+          </span>
+          <ChevronRight size={20} className="shrink-0 text-neutral-300" />
+        </button>
+
+        <button
           onClick={() => navigate("/eslatmalar")}
           className="flex w-full items-center gap-4 rounded-card border border-secondary/20 bg-secondary/5 p-4 text-left transition hover:border-secondary/40 hover:bg-secondary/10 active:scale-[0.99]"
         >
@@ -190,6 +207,10 @@ export default function Home() {
         onBook={(s) => navigate(`/band-qilish/${s.id}`)}
       />
       <LocationSheet open={locationOpen} onClose={() => setLocationOpen(false)} />
+
+      <Sheet open={bpOpen} onClose={() => setBpOpen(false)} title="Qon bosimini o'lchash">
+        {bpOpen && <BloodPressureCheck onClose={() => setBpOpen(false)} />}
+      </Sheet>
     </div>
   );
 }

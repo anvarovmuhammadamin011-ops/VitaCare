@@ -79,13 +79,20 @@ export function PatientHealthProvider({ children }) {
     });
   }
 
-  function addVital(phone, type, value) {
+  function addVital(phone, type, value, extra = {}) {
     if (!phone || !value) return;
     setByPhone((cur) => {
       const h = ensure(phone);
-      const history = [...h.vitals[type], { value, at: Date.now() }].slice(-MAX_VITAL_POINTS);
+      const history = [...h.vitals[type], { value, at: Date.now(), source: "patient", ...extra }].slice(
+        -MAX_VITAL_POINTS
+      );
       return { ...cur, [phone]: { ...h, vitals: { ...h.vitals, [type]: history } } };
     });
+  }
+
+  // Read-only snapshot for admin-side aggregate views (e.g. blood pressure distribution).
+  function getAllPatientHealth() {
+    return byPhone;
   }
 
   function addAddress(phone, address) {
@@ -156,6 +163,7 @@ export function PatientHealthProvider({ children }) {
         addListItem,
         removeListItem,
         addVital,
+        getAllPatientHealth,
         addAddress,
         updateAddress,
         removeAddress,

@@ -1,12 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { loadState, saveState } from "./storage";
-import {
-  seedPharmacyOrders,
-  seedPharmacyPayouts,
-  PHARMACY_PRESCRIPTION_COMMISSION_RATE,
-  PHARMACY_PLAIN_COMMISSION_RATE,
-  deliveryFleet,
-} from "../data/mockData";
+import { seedPharmacyOrders, seedPharmacyPayouts, deliveryFleet } from "../data/mockData";
+import { usePlatformSettings } from "./PlatformSettingsContext";
 
 const ORDERS_KEY = "vitacare.pharmacyOrders";
 const DRUGS_KEY = "vitacare.pharmacyDrugs";
@@ -19,6 +14,7 @@ function drugNumber(id) {
 }
 
 export function PharmacyProvider({ children }) {
+  const { settings } = usePlatformSettings();
   const [orders, setOrders] = useState(() => loadState(ORDERS_KEY, seedPharmacyOrders));
   const [drugs, setDrugs] = useState(() => loadState(DRUGS_KEY, []));
 
@@ -96,8 +92,8 @@ export function PharmacyProvider({ children }) {
   // oylik hisobotda alohida ko'rsatiladi (PharmacistEarnings.jsx).
   const prescriptionTotal = prescriptionCompleted.reduce((sum, o) => sum + o.total, 0);
   const plainTotal = plainCompleted.reduce((sum, o) => sum + o.total, 0);
-  const prescriptionCommission = Math.round(prescriptionTotal * PHARMACY_PRESCRIPTION_COMMISSION_RATE);
-  const plainCommission = Math.round(plainTotal * PHARMACY_PLAIN_COMMISSION_RATE);
+  const prescriptionCommission = Math.round(prescriptionTotal * settings.commission.pharmacyPrescription);
+  const plainCommission = Math.round(plainTotal * settings.commission.pharmacyPlain);
 
   const grossEarnings = prescriptionTotal + plainTotal;
   const commission = prescriptionCommission + plainCommission;

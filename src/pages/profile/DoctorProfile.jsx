@@ -569,6 +569,16 @@ export default function DoctorProfile() {
       <section className="px-4">
         <Card className="border-neutral-100">
           <h2 className="text-sm font-bold text-neutral-900">Xizmat tarifi</h2>
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-primary/5 px-3 py-2 text-sm">
+            <span className="font-semibold text-neutral-800">Konsultatsiya narxi (1 soat)</span>
+            <input
+              type="number"
+              min="0"
+              value={p.hourlyRate}
+              onChange={(e) => provider.updateProviderProfile(user.phone, { hourlyRate: Number(e.target.value) })}
+              className="h-9 w-32 rounded-lg border border-neutral-200 px-2 text-right text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
           <ul className="mt-3 flex flex-col gap-2">
             {careServices.slice(0, 6).map((s) => {
               const price = p.tariffs[s.id] ?? s.price ?? s.pricePerHour;

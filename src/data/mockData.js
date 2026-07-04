@@ -129,6 +129,25 @@ export const careServices = [
     maxHours: 8,
     icon: "Wind",
   },
+  {
+    id: "qariyalar-parvarishi",
+    name: "Qariyalar parvarishi",
+    pricePerHour: 90000,
+    minHours: 2,
+    maxHours: 8,
+    icon: "HeartHandshake",
+  },
+  { id: "yara-pansimon", name: "Yara pansimon qilish", price: 45000, duration: "20 daqiqa", icon: "Bandage" },
+  { id: "vena-kateter", name: "Vena kateteri o'rnatish", price: 60000, duration: "15 daqiqa", icon: "Syringe" },
+  { id: "diabet-monitoring", name: "Diabet monitoring", price: 40000, duration: "15 daqiqa", icon: "TestTube" },
+  {
+    id: "logoped-mashg'ulot",
+    name: "Logoped mashg'uloti",
+    pricePerHour: 110000,
+    minHours: 1,
+    maxHours: 2,
+    icon: "Waves",
+  },
 ];
 
 // Bookable nurse profiles shown on the "Hamshiralar" tab, each with their own service list.

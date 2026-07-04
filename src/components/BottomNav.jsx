@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Home, LayoutGrid, ClipboardList, User, Wallet } from "lucide-react";
+import { Home, LayoutGrid, ClipboardList, User, Wallet, Users, HeartPulse, Settings } from "lucide-react";
 import { useOrders } from "../store/OrdersContext";
 import { usePharmacy } from "../store/PharmacyContext";
 import { useDoctor } from "../store/DoctorContext";
@@ -26,14 +26,23 @@ const doctorTabs = [
   { to: "/profil", label: "Profil", icon: User },
 ];
 
+const adminTabs = [
+  { to: "/", label: "Bosh sahifa", icon: Home },
+  { to: "/admin/foydalanuvchilar", label: "Foydalanuvchilar", icon: Users },
+  { to: "/admin/buyurtmalar", label: "Buyurtmalar", icon: ClipboardList },
+  { to: "/admin/qon-bosimi", label: "Qon bosimi", icon: HeartPulse },
+  { to: "/admin/sozlamalar", label: "Sozlamalar", icon: Settings },
+];
+
 export default function BottomNav() {
   const { user } = useAuth();
+  const isPharmacist = user?.role === "aptekachi";
+  const isDoctor = user?.role === "doktor";
+  const isAdmin = user?.role === "admin";
   const { active } = useOrders();
   const { incoming: pharmacyIncoming } = usePharmacy();
   const { incoming: doctorIncoming } = useDoctor();
-  const isPharmacist = user?.role === "aptekachi";
-  const isDoctor = user?.role === "doktor";
-  const tabs = isPharmacist ? pharmacistTabs : isDoctor ? doctorTabs : patientTabs;
+  const tabs = isAdmin ? adminTabs : isPharmacist ? pharmacistTabs : isDoctor ? doctorTabs : patientTabs;
   const badgeCount = {
     orders: isPharmacist ? pharmacyIncoming.length : isDoctor ? doctorIncoming.length : active.length,
   };

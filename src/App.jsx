@@ -10,6 +10,7 @@ import Reminders from "./pages/Reminders";
 import HealthHistory from "./pages/HealthHistory";
 import Services from "./pages/Services";
 import Booking from "./pages/Booking";
+import DoctorBooking from "./pages/DoctorBooking";
 import ServiceCart from "./pages/ServiceCart";
 import Nurses from "./pages/Nurses";
 import Doctors from "./pages/Doctors";
@@ -24,8 +25,14 @@ import DoctorEarnings from "./pages/DoctorEarnings";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import QuickSwitch from "./pages/QuickSwitch";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminBookings from "./pages/admin/AdminBookings";
+import AdminBloodPressure from "./pages/admin/AdminBloodPressure";
+import AdminSettings from "./pages/admin/AdminSettings";
 import { AuthProvider, useAuth } from "./store/AuthContext";
 import { CityProvider } from "./store/CityContext";
+import { PlatformSettingsProvider } from "./store/PlatformSettingsContext";
 import { OrdersProvider } from "./store/OrdersContext";
 import { PharmacyProvider } from "./store/PharmacyContext";
 import { DoctorProvider } from "./store/DoctorContext";
@@ -80,12 +87,28 @@ function Gate() {
     );
   }
 
+  if (user.role === "admin") {
+    return (
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<AdminDashboard />} />
+          <Route path="/admin/foydalanuvchilar" element={<AdminUsers />} />
+          <Route path="/admin/buyurtmalar" element={<AdminBookings />} />
+          <Route path="/admin/qon-bosimi" element={<AdminBloodPressure />} />
+          <Route path="/admin/sozlamalar" element={<AdminSettings />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
+  }
+
   return (
     <Routes>
       <Route element={<AppLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/xizmatlar" element={<Services />} />
         <Route path="/band-qilish/:serviceId" element={<Booking />} />
+        <Route path="/doktor-band-qilish/:phone" element={<DoctorBooking />} />
         <Route path="/xizmat-savati" element={<ServiceCart />} />
         <Route path="/xizmat-savati/:providerType/:providerId" element={<ServiceCart />} />
         <Route path="/hamshiralar" element={<Nurses />} />
@@ -106,29 +129,31 @@ export default function App() {
   return (
     <AuthProvider>
       <CityProvider>
-        <OrdersProvider>
-          <PharmacyProvider>
-            <DoctorProvider>
-              <ToastProvider>
-                <NotificationsProvider>
-                  <SettingsProvider>
-                    <ActivityLogProvider>
-                      <PatientHealthProvider>
-                        <ProviderProfileProvider>
-                          <RemindersProvider>
-                            <BrowserRouter>
-                              <Gate />
-                            </BrowserRouter>
-                          </RemindersProvider>
-                        </ProviderProfileProvider>
-                      </PatientHealthProvider>
-                    </ActivityLogProvider>
-                  </SettingsProvider>
-                </NotificationsProvider>
-              </ToastProvider>
-            </DoctorProvider>
-          </PharmacyProvider>
-        </OrdersProvider>
+        <PlatformSettingsProvider>
+          <OrdersProvider>
+            <PharmacyProvider>
+              <DoctorProvider>
+                <ToastProvider>
+                  <NotificationsProvider>
+                    <SettingsProvider>
+                      <ActivityLogProvider>
+                        <PatientHealthProvider>
+                          <ProviderProfileProvider>
+                            <RemindersProvider>
+                              <BrowserRouter>
+                                <Gate />
+                              </BrowserRouter>
+                            </RemindersProvider>
+                          </ProviderProfileProvider>
+                        </PatientHealthProvider>
+                      </ActivityLogProvider>
+                    </SettingsProvider>
+                  </NotificationsProvider>
+                </ToastProvider>
+              </DoctorProvider>
+            </PharmacyProvider>
+          </OrdersProvider>
+        </PlatformSettingsProvider>
       </CityProvider>
     </AuthProvider>
   );

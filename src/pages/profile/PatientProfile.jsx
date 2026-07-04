@@ -11,7 +11,6 @@ import {
   Download,
   Globe,
   HeartPulse,
-  Lock,
   LogOut,
   MapPin,
   Pencil,
@@ -261,85 +260,21 @@ export default function PatientProfile() {
             </dl>
           </Card>
 
-          <Card className="border-neutral-100">
-            <div className="flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-sm font-bold text-neutral-900">
-                <Stethoscope size={15} className="text-primary" /> Sog'lig'i tarixi
-              </h2>
-              <button
-                onClick={() => navigate("/sogligim-tarixi")}
-                className="flex items-center gap-0.5 text-xs font-semibold text-primary-dark"
-              >
-                To'liq tarix <ChevronRight size={13} />
-              </button>
-            </div>
-            <div className="mt-3 flex flex-col gap-3">
-              <div>
-                <label className={labelClass}>Xroniya kasalliklari</label>
-                <div className="mt-1">
-                  <TagList
-                    items={h.chronic}
-                    onAdd={(v) => {
-                      health.addListItem(user.phone, "chronic", v);
-                      log(`Xroniya kasallik qo'shildi: ${v}`);
-                    }}
-                    onRemove={(v) => health.removeListItem(user.phone, "chronic", v)}
-                    placeholder="Masalan: Diabet"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className={`${labelClass} flex items-center gap-1`}>
-                  <AlertTriangle size={12} className="text-warning" /> Allergiyalar
-                  <span className="font-normal text-neutral-400">(Doktor/Hamshiraga ko'rinadi)</span>
-                </label>
-                <div className="mt-1">
-                  <TagList
-                    items={h.allergies}
-                    onAdd={(v) => {
-                      health.addListItem(user.phone, "allergies", v);
-                      log(`Allergiya qo'shildi: ${v}`);
-                    }}
-                    onRemove={(v) => health.removeListItem(user.phone, "allergies", v)}
-                    placeholder="Masalan: Penitsillin"
-                    tone="warning"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className={labelClass}>Olingan operatsiyalar</label>
-                <div className="mt-1">
-                  <TagList
-                    items={h.surgeries}
-                    onAdd={(v) => health.addListItem(user.phone, "surgeries", v)}
-                    onRemove={(v) => health.removeListItem(user.phone, "surgeries", v)}
-                    placeholder="Masalan: Appendektomiya (2019)"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className={labelClass}>Qabul qilayotgan dorilar</label>
-                <button
-                  onClick={() => navigate("/eslatmalar")}
-                  className="mt-1 flex w-full items-center justify-between rounded-xl border border-neutral-200 px-3 py-2.5 text-left text-sm hover:border-primary/40"
-                >
-                  <span className="text-neutral-600">
-                    {reminders.length ? reminders.map((r) => r.name).join(", ") : "Hali qo'shilmagan"}
-                  </span>
-                  <ChevronRight size={16} className="shrink-0 text-neutral-300" />
-                </button>
-              </div>
-              <button onClick={() => setSheet({ type: "tibbiy" })} className="flex items-center gap-1 self-start text-xs font-semibold text-primary-dark">
-                <Pencil size={12} /> Qon guruhi / Bo'y / Vazn tahrirlash
-              </button>
-              <dl className="grid grid-cols-2 gap-3 text-sm">
-                <Row label="Qon guruhi" value={h.bloodType || "—"} />
-                <Row label="Rezus omili" value={h.rhFactor || "—"} />
-                <Row label="Bo'y" value={h.height ? `${h.height} sm` : "—"} />
-                <Row label="Vazn" value={h.weight ? `${h.weight} kg` : "—"} />
-              </dl>
-            </div>
-          </Card>
+          <button
+            onClick={() => setSheet({ type: "sogliqTarixi" })}
+            className="flex w-full items-center gap-3 rounded-card border border-neutral-100 bg-white p-4 text-left transition hover:border-primary/40 active:scale-[0.99]"
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary-dark">
+              <Stethoscope size={18} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-bold text-neutral-900">Sog'lig'i tarixi</span>
+              <span className="block text-label text-neutral-500">
+                Xroniya kasalliklar, allergiya, qon guruhi va h.k.
+              </span>
+            </span>
+            <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+          </button>
 
           <VitalCard
             icon={HeartPulse}
@@ -526,51 +461,11 @@ export default function PatientProfile() {
 
       <section className="px-4">
         <Card className="border-neutral-100">
-          <h2 className="flex items-center gap-2 text-sm font-bold text-neutral-900">
-            <Lock size={15} className="text-neutral-500" /> Maxfiylik
-          </h2>
-          <div className="mt-3 flex flex-col gap-3 text-sm">
-            <div>
-              <label className={labelClass}>Profil ko'rinishi</label>
-              <div className="mt-1.5 flex gap-2">
-                {["Hamma", "Faqat doktorlar", "Xavfsiz"].map((v) => (
-                  <Pill
-                    key={v}
-                    active={settings.privacy.profileVisibility === v}
-                    onClick={() => updateSettings(user.phone, { privacy: { ...settings.privacy, profileVisibility: v } })}
-                    className="text-xs"
-                  >
-                    {v}
-                  </Pill>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className={labelClass}>Eski buyurtmalarni o'chirish</label>
-              <div className="mt-1.5 flex gap-2">
-                {[30, 60, 90].map((d) => (
-                  <Pill
-                    key={d}
-                    active={settings.privacy.autoDeleteDays === d}
-                    onClick={() => updateSettings(user.phone, { privacy: { ...settings.privacy, autoDeleteDays: d } })}
-                    className="text-xs"
-                  >
-                    {d} kun
-                  </Pill>
-                ))}
-              </div>
-            </div>
-          </div>
-        </Card>
-      </section>
-
-      <section className="px-4">
-        <Card className="border-neutral-100">
-          <h2 className="flex items-center gap-2 text-sm font-bold text-neutral-900">
-            <Globe size={15} className="text-neutral-500" /> Til va Tema
-          </h2>
-          <div className="mt-3 flex flex-col gap-3">
-            <div className="flex gap-2">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-sm font-bold text-neutral-900">
+              <Globe size={15} className="text-neutral-500" /> Til
+            </h2>
+            <div className="flex gap-1.5">
               {[
                 { id: "uz", label: "O'zbek" },
                 { id: "ru", label: "Rus" },
@@ -578,16 +473,6 @@ export default function PatientProfile() {
               ].map((l) => (
                 <Pill key={l.id} active={settings.language === l.id} onClick={() => updateSettings(user.phone, { language: l.id })} className="text-xs">
                   {l.label}
-                </Pill>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              {[
-                { id: "kun", label: "Kun rejimi" },
-                { id: "tun", label: "Tungi rejim" },
-              ].map((t) => (
-                <Pill key={t.id} active={settings.theme === t.id} onClick={() => updateSettings(user.phone, { theme: t.id })} className="text-xs">
-                  {t.label}
                 </Pill>
               ))}
             </div>
@@ -652,6 +537,81 @@ export default function PatientProfile() {
 
       <Sheet open={sheet?.type === "tibbiy"} onClose={closeSheet} title="Tibbiy ko'rsatkichlar">
         <MedicalForm health={h} onSave={saveMedical} />
+      </Sheet>
+
+      <Sheet open={sheet?.type === "sogliqTarixi"} onClose={closeSheet} title="Sog'lig'i tarixi">
+        <div className="flex flex-col gap-4">
+          <div>
+            <label className={labelClass}>Xroniya kasalliklari</label>
+            <div className="mt-1">
+              <TagList
+                items={h.chronic}
+                onAdd={(v) => {
+                  health.addListItem(user.phone, "chronic", v);
+                  log(`Xroniya kasallik qo'shildi: ${v}`);
+                }}
+                onRemove={(v) => health.removeListItem(user.phone, "chronic", v)}
+                placeholder="Masalan: Diabet"
+              />
+            </div>
+          </div>
+          <div>
+            <label className={`${labelClass} flex items-center gap-1`}>
+              <AlertTriangle size={12} className="text-warning" /> Allergiyalar
+              <span className="font-normal text-neutral-400">(Doktor/Hamshiraga ko'rinadi)</span>
+            </label>
+            <div className="mt-1">
+              <TagList
+                items={h.allergies}
+                onAdd={(v) => {
+                  health.addListItem(user.phone, "allergies", v);
+                  log(`Allergiya qo'shildi: ${v}`);
+                }}
+                onRemove={(v) => health.removeListItem(user.phone, "allergies", v)}
+                placeholder="Masalan: Penitsillin"
+                tone="warning"
+              />
+            </div>
+          </div>
+          <div>
+            <label className={labelClass}>Olingan operatsiyalar</label>
+            <div className="mt-1">
+              <TagList
+                items={h.surgeries}
+                onAdd={(v) => health.addListItem(user.phone, "surgeries", v)}
+                onRemove={(v) => health.removeListItem(user.phone, "surgeries", v)}
+                placeholder="Masalan: Appendektomiya (2019)"
+              />
+            </div>
+          </div>
+          <div>
+            <label className={labelClass}>Qabul qilayotgan dorilar</label>
+            <button
+              onClick={() => navigate("/eslatmalar")}
+              className="mt-1 flex w-full items-center justify-between rounded-xl border border-neutral-200 px-3 py-2.5 text-left text-sm hover:border-primary/40"
+            >
+              <span className="text-neutral-600">
+                {reminders.length ? reminders.map((r) => r.name).join(", ") : "Hali qo'shilmagan"}
+              </span>
+              <ChevronRight size={16} className="shrink-0 text-neutral-300" />
+            </button>
+          </div>
+          <button onClick={() => setSheet({ type: "tibbiy" })} className="flex items-center gap-1 self-start text-xs font-semibold text-primary-dark">
+            <Pencil size={12} /> Qon guruhi / Bo'y / Vazn tahrirlash
+          </button>
+          <dl className="grid grid-cols-2 gap-3 text-sm">
+            <Row label="Qon guruhi" value={h.bloodType || "—"} />
+            <Row label="Rezus omili" value={h.rhFactor || "—"} />
+            <Row label="Bo'y" value={h.height ? `${h.height} sm` : "—"} />
+            <Row label="Vazn" value={h.weight ? `${h.weight} kg` : "—"} />
+          </dl>
+          <button
+            onClick={() => navigate("/sogligim-tarixi")}
+            className="flex items-center justify-center gap-1 rounded-xl border border-neutral-200 py-2.5 text-xs font-semibold text-primary-dark"
+          >
+            To'liq tarixni ko'rish <ChevronRight size={13} />
+          </button>
+        </div>
       </Sheet>
 
       <Sheet open={sheet?.type === "manzil"} onClose={closeSheet} title={sheet?.editingId ? "Manzilni tahrirlash" : "Yangi manzil"}>

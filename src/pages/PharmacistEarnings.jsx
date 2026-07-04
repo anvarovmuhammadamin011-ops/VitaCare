@@ -5,6 +5,7 @@ import StatsPanel from "../components/StatsPanel";
 import { Check, Wallet } from "lucide-react";
 import { usePharmacy } from "../store/PharmacyContext";
 import { useToast } from "../store/ToastContext";
+import { usePlatformSettings } from "../store/PlatformSettingsContext";
 
 function formatSom(n) {
   return `${n.toLocaleString("uz-UZ")} so'm`;
@@ -27,6 +28,7 @@ export default function PharmacistEarnings() {
     reviewCount,
   } = usePharmacy();
   const { notify } = useToast();
+  const { settings } = usePlatformSettings();
 
   const itemCounts = completed.reduce((acc, o) => {
     o.items.forEach((item) => {
@@ -74,11 +76,15 @@ export default function PharmacistEarnings() {
           <dl className="mt-4 flex flex-col gap-3 text-sm">
             <div className="flex flex-col gap-1.5 rounded-xl border border-neutral-100 p-3">
               <Row label={`Oddiy zakazlar (${plainCompleted.length} ta)`} value={formatSom(plainTotal)} />
-              <Row label="Komissiya (3%)" value={`-${formatSom(plainCommission)}`} muted />
+              <Row label={`Komissiya (${Math.round(settings.commission.pharmacyPlain * 100)}%)`} value={`-${formatSom(plainCommission)}`} muted />
             </div>
             <div className="flex flex-col gap-1.5 rounded-xl border border-secondary/20 bg-secondary/5 p-3">
               <Row label={`Retsept zakazlari (${prescriptionCompleted.length} ta)`} value={formatSom(prescriptionTotal)} />
-              <Row label="Komissiya (5%)" value={`-${formatSom(prescriptionCommission)}`} muted />
+              <Row
+                label={`Komissiya (${Math.round(settings.commission.pharmacyPrescription * 100)}%)`}
+                value={`-${formatSom(prescriptionCommission)}`}
+                muted
+              />
             </div>
             {plainCompleted.length + prescriptionCompleted.length === 0 && (
               <p className="text-small text-neutral-400">Hali tugallangan zakaz yo'q</p>

@@ -14,6 +14,7 @@ function seedProfile() {
     extraCities: [],
     bank: { iban: "", bankName: "", tin: "", taxType: "Yakka tartibdagi tadbirkor" },
     tariffs: {},
+    hourlyRate: 100000,
     insuranceCoveragePercent: 80,
     availability: { online: true, offToday: false, autoReply: "" },
     branches: [],

@@ -1,13 +1,15 @@
 import { createContext, useContext } from "react";
-import { seedPayouts, DOCTOR_COMMISSION_RATE } from "../data/mockData";
+import { seedPayouts } from "../data/mockData";
 import { useOrders } from "./OrdersContext";
 import { useAuth } from "./AuthContext";
+import { usePlatformSettings } from "./PlatformSettingsContext";
 
 const DoctorContext = createContext(null);
 
 export function DoctorProvider({ children }) {
   const { user } = useAuth();
   const { orders, acceptOrder: acceptShared, rejectOrder, startTrip, completeOrder } = useOrders();
+  const { settings } = usePlatformSettings();
 
   // A doctor works requests specifically addressed to them, plus any open
   // (no provider picked yet) request still up for grabs in the shared queue.
@@ -29,7 +31,7 @@ export function DoctorProvider({ children }) {
   const cancelled = targeted.filter((o) => o.status === "bekor qilindi");
 
   const grossEarnings = completed.reduce((sum, o) => sum + o.price, 0);
-  const commission = Math.round(grossEarnings * DOCTOR_COMMISSION_RATE);
+  const commission = Math.round(grossEarnings * settings.commission.doctor);
   const netEarnings = grossEarnings - commission;
 
   const reviewed = completed.filter((o) => o.rating);
