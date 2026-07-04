@@ -13,6 +13,8 @@ import {
   Sparkles,
   HeartHandshake,
   ClipboardList,
+  Activity,
+  Wind,
 } from "lucide-react";
 
 const icons = {
@@ -29,6 +31,8 @@ const icons = {
   Sparkles,
   HeartHandshake,
   ClipboardList,
+  Activity,
+  Wind,
 };
 
 export default function ServiceIcon({ name, ...props }) {

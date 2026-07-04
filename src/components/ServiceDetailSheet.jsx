@@ -17,7 +17,9 @@ export default function ServiceDetailSheet({ service, onClose, onBook }) {
               <ServiceIcon name={service.icon} size={28} strokeWidth={1.75} />
             </span>
             <div>
-              <p className="text-lg font-bold text-neutral-900">{formatSom(service.price)}</p>
+              <p className="text-lg font-bold text-neutral-900">
+                {service.pricePerHour ? `${formatSom(service.pricePerHour)}/soat` : formatSom(service.price)}
+              </p>
               <p className="mt-0.5 flex items-center gap-1 text-sm text-neutral-500">
                 <Star size={14} className="fill-warning text-warning" /> {service.rating} · {service.reviews} sharh
               </p>

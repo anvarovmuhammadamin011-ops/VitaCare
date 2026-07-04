@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Orders from "./pages/Orders";
 import Profile from "./pages/Profile";
 import Reimbursement from "./pages/Reimbursement";
+import Reminders from "./pages/Reminders";
 import Services from "./pages/Services";
 import Booking from "./pages/Booking";
 import PharmacistHome from "./pages/PharmacistHome";
@@ -21,6 +22,7 @@ import { OrdersProvider } from "./store/OrdersContext";
 import { PharmacyProvider } from "./store/PharmacyContext";
 import { DoctorProvider } from "./store/DoctorContext";
 import { ToastProvider } from "./store/ToastContext";
+import { RemindersProvider } from "./store/RemindersContext";
 
 function Gate() {
   const { user } = useAuth();
@@ -73,6 +75,7 @@ function Gate() {
         <Route path="/buyurtmalar" element={<Orders />} />
         <Route path="/profil" element={<Profile />} />
         <Route path="/reimbursatsiya" element={<Reimbursement />} />
+        <Route path="/eslatmalar" element={<Reminders />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -87,9 +90,11 @@ export default function App() {
           <PharmacyProvider>
             <DoctorProvider>
               <ToastProvider>
-                <BrowserRouter>
-                  <Gate />
-                </BrowserRouter>
+                <RemindersProvider>
+                  <BrowserRouter>
+                    <Gate />
+                  </BrowserRouter>
+                </RemindersProvider>
               </ToastProvider>
             </DoctorProvider>
           </PharmacyProvider>

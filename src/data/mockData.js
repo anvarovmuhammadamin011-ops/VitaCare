@@ -1,3 +1,9 @@
+// Seed medicine reminders shown on the patient's "Dori eslatuvchilari" page.
+export const seedReminders = [
+  { id: "REM-1", name: "Insulin", dosage: "10 birlik", times: ["09:00", "20:00"], active: true },
+  { id: "REM-2", name: "Aspirin", dosage: "1 tabletka", times: ["20:00"], active: true },
+];
+
 export const quickServices = [
   {
     id: "blood",
@@ -73,11 +79,13 @@ export const quickServices = [
     id: "iv",
     icon: "Bandage",
     name: "Infuziya",
-    price: 90000,
+    pricePerHour: 100000,
+    minHours: 1,
+    maxHours: 6,
     rating: 4.8,
     reviews: 150,
     available: 2,
-    description: "Tomchilatib dori yuborish (infuziya) tartibi malakali hamshira nazorati ostida o'tkaziladi.",
+    description: "Tomchilatib dori yuborish (infuziya) tartibi malakali hamshira nazorati ostida o'tkaziladi. 1-6 soat uchun band qilish mumkin.",
   },
 ];
 
@@ -87,10 +95,65 @@ export const careServices = [
   { id: "oliy-hamshira", name: "Oliy toifali hamshira", price: 90000, icon: "Award" },
   { id: "bolalar-massaji", name: "Bolalar massaji", price: 70000, icon: "Baby" },
   { id: "kichkintoy-muolaja", name: "Kichkintoylar uchun muolaja", price: 85000, icon: "Syringe" },
-  { id: "ayollar-massaj", name: "Ayollar uchun massaj", price: 95000, icon: "Sparkles" },
+  {
+    id: "ayollar-massaj",
+    name: "Ayollar uchun massaj",
+    pricePerHour: 80000,
+    minHours: 1,
+    maxHours: 3,
+    icon: "Sparkles",
+  },
   { id: "enaga", name: "Enaga", price: 120000, icon: "HeartHandshake" },
   { id: "bolalar-shifokori", name: "Bolalar shifokori", price: 100000, icon: "HeartPulse" },
   { id: "tibbiy-korik", name: "Tibbiy ko'rik", price: 55000, icon: "ClipboardList" },
+  {
+    id: "fizioterapiya",
+    name: "Fizioterapiya",
+    pricePerHour: 120000,
+    minHours: 1,
+    maxHours: 4,
+    icon: "Activity",
+  },
+  {
+    id: "oksigen-terapiya",
+    name: "Oksigen terapiyasi",
+    pricePerHour: 80000,
+    minHours: 1,
+    maxHours: 8,
+    icon: "Wind",
+  },
+];
+
+// Bookable nurse/doctor profiles shown when a patient picks who should serve them.
+// Real registered Doktor accounts are merged in alongside these at booking time.
+export const seedProviders = [
+  {
+    id: "dilyora-sultanova",
+    name: "Dilyora Sultanova",
+    specialty: "IV infuziya, Qon olish, Oksigen terapiya",
+    experienceYears: 15,
+    rating: 4.9,
+    reviewCount: 250,
+    todayAvailable: "09:00-22:00",
+  },
+  {
+    id: "feruza-zainab",
+    name: "Feruza Zainab",
+    specialty: "Umumiy hamshira, Massaj",
+    experienceYears: 8,
+    rating: 4.8,
+    reviewCount: 180,
+    todayAvailable: "10:00-20:00",
+  },
+  {
+    id: "yulduz-rahimova",
+    name: "Yulduz Rahimova",
+    specialty: "Fizioterapiya, Insulin in'eksiyasi",
+    experienceYears: 6,
+    rating: 4.7,
+    reviewCount: 150,
+    todayAvailable: "11:00-21:00",
+  },
 ];
 
 // Seed data — used only the first time the app loads (no localStorage yet).

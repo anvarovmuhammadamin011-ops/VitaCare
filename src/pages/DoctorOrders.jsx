@@ -67,6 +67,7 @@ export default function DoctorOrders() {
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Clock size={14} className="text-neutral-400" /> {o.time}
+                  {o.hours && ` (${o.hours} soat)`}
                 </span>
               </div>
               {o.note && <p className="mt-2 text-label text-error">{o.note}</p>}

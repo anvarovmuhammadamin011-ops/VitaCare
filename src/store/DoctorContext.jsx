@@ -7,17 +7,15 @@ const DoctorContext = createContext(null);
 
 export function DoctorProvider({ children }) {
   const { user } = useAuth();
-  const { orders, acceptOrder: acceptShared, rejectOrder, startTrip, completeOrder } = useOrders();
+  const { orders, acceptOrder, rejectOrder, startTrip, completeOrder } = useOrders();
 
-  function acceptOrder(id) {
-    const provider = user ? `Dr. ${user.firstName} ${user.lastName}` : undefined;
-    acceptShared(id, provider);
-  }
+  // A doctor only works the requests a patient specifically addressed to them.
+  const mine = user ? orders.filter((o) => o.providerPhone === user.phone) : [];
 
-  const incoming = orders.filter((o) => o.status === "yangi");
-  const active = orders.filter((o) => o.status === "qabul qilingan" || o.status === "yolda");
-  const completed = orders.filter((o) => o.status === "tugallandi");
-  const cancelled = orders.filter((o) => o.status === "bekor qilindi");
+  const incoming = mine.filter((o) => o.status === "yangi");
+  const active = mine.filter((o) => o.status === "qabul qilingan" || o.status === "yolda");
+  const completed = mine.filter((o) => o.status === "tugallandi");
+  const cancelled = mine.filter((o) => o.status === "bekor qilindi");
 
   const grossEarnings = completed.reduce((sum, o) => sum + o.price, 0);
   const commission = Math.round(grossEarnings * DOCTOR_COMMISSION_RATE);
@@ -31,7 +29,7 @@ export function DoctorProvider({ children }) {
   return (
     <DoctorContext.Provider
       value={{
-        orders,
+        orders: mine,
         incoming,
         active,
         completed,

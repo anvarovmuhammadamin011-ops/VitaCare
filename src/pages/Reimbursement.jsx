@@ -1,6 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, ShieldCheck, Upload, FileCheck2, Clock, PackageCheck, FileText, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Bell,
+  Check,
+  ShieldCheck,
+  Upload,
+  FileCheck2,
+  Clock,
+  PackageCheck,
+  FileText,
+  X,
+} from "lucide-react";
 import Button from "../components/ui/Button";
 import { useToast } from "../store/ToastContext";
 
@@ -192,6 +203,25 @@ export default function Reimbursement() {
           );
         })}
       </div>
+
+      {files[1] && (
+        <div className="px-4">
+          <button
+            onClick={() => navigate("/eslatmalar")}
+            className="flex w-full items-center gap-3 rounded-card border border-secondary/20 bg-secondary/5 p-3.5 text-left transition hover:border-secondary/40 hover:bg-secondary/10 active:scale-[0.99]"
+          >
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-white">
+              <Bell size={16} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-bold text-neutral-900">Dori eslatmasi qo'shasizmi?</span>
+              <span className="block text-label text-neutral-500">
+                Retseptdagi dorilarni o'z vaqtida ichishni unutmang
+              </span>
+            </span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

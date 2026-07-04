@@ -32,7 +32,9 @@ export default function Services() {
             </span>
             <span className="w-full">
               <span className="block text-sm font-bold leading-tight text-neutral-900">{s.name}</span>
-              <span className="mt-1 block text-small text-neutral-500">{formatSom(s.price)}</span>
+              <span className="mt-1 block text-small text-neutral-500">
+                {s.pricePerHour ? `${formatSom(s.pricePerHour)}/soat` : formatSom(s.price)}
+              </span>
             </span>
           </button>
         ))}

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { loadState, saveState } from "./storage";
 import { seedPharmacyOrders, seedPharmacyPayouts, PHARMACY_COMMISSION_RATE, deliveryFleet } from "../data/mockData";
 
@@ -7,15 +7,24 @@ const DRUGS_KEY = "vitacare.pharmacyDrugs";
 
 const PharmacyContext = createContext(null);
 
-let counter = 100;
-function nextDrugId() {
-  counter += 1;
-  return `DRG-${counter}`;
+function drugNumber(id) {
+  const match = /(\d+)$/.exec(id ?? "");
+  return match ? Number(match[1]) : 0;
 }
 
 export function PharmacyProvider({ children }) {
   const [orders, setOrders] = useState(() => loadState(ORDERS_KEY, seedPharmacyOrders));
   const [drugs, setDrugs] = useState(() => loadState(DRUGS_KEY, []));
+
+  // Seeded from the highest existing drug number so ids stay unique across reloads.
+  const counterRef = useRef();
+  if (counterRef.current === undefined) {
+    counterRef.current = drugs.reduce((max, d) => Math.max(max, drugNumber(d.id)), 100);
+  }
+  function nextDrugId() {
+    counterRef.current += 1;
+    return `DRG-${counterRef.current}`;
+  }
 
   useEffect(() => saveState(ORDERS_KEY, orders), [orders]);
   useEffect(() => saveState(DRUGS_KEY, drugs), [drugs]);

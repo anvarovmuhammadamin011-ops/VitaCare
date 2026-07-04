@@ -17,7 +17,11 @@ function reorderPayload(o, user) {
     address: o.address,
     time: o.time,
     price: o.price,
+    hours: o.hours,
     paid: false,
+    provider: o.provider,
+    providerPhone: o.providerPhone ?? null,
+    providerType: o.providerType,
   };
 }
 
@@ -26,7 +30,7 @@ function formatSom(n) {
 }
 
 const activeBadge = {
-  yangi: { tone: "info", label: "Qidirilmoqda" },
+  yangi: { tone: "info", label: "Tasdiqlash kutilmoqda" },
   "qabul qilingan": { tone: "info", label: "Rejalashtirildi" },
   yolda: { tone: "warning", label: "Yo'lda" },
 };
@@ -87,20 +91,15 @@ export default function Orders() {
                     <Activity size={15} className="text-warning" /> {o.title}
                   </h3>
                   <div className="mt-2 flex flex-col gap-1 text-sm text-neutral-600">
-                    {o.provider ? (
-                      <span className="flex items-center gap-1.5">
-                        <User size={14} className="text-neutral-400" /> {o.provider}
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1.5 text-neutral-400">
-                        <User size={14} /> Xizmat ko'rsatuvchi qidirilmoqda...
-                      </span>
-                    )}
+                    <span className="flex items-center gap-1.5">
+                      <User size={14} className="text-neutral-400" /> {o.provider}
+                    </span>
                     <span className="flex items-center gap-1.5">
                       <MapPin size={14} className="text-neutral-400" /> {o.address}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <Clock size={14} className="text-neutral-400" /> {o.time}
+                      {o.hours && ` (${o.hours} soat)`}
                     </span>
                   </div>
                   <p className="mt-2 text-base font-semibold text-neutral-900">
@@ -109,24 +108,22 @@ export default function Orders() {
                       ({o.paid ? "to'landi" : "to'lovga tayyor"})
                     </span>
                   </p>
-                  {o.provider && (
-                    <div className="mt-3 flex gap-2">
-                      <Button
-                        variant="secondary"
-                        onClick={() => notify("Xabarlar tez orada mavjud bo'ladi")}
-                        className="h-10 flex-1 text-sm"
-                      >
-                        <MessageSquare size={14} /> Chat
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        onClick={() => notify(`${o.provider} bilan qo'ng'iroq: tez orada mavjud bo'ladi`)}
-                        className="h-10 flex-1 text-sm"
-                      >
-                        <Phone size={14} /> Qo'ng'iroq
-                      </Button>
-                    </div>
-                  )}
+                  <div className="mt-3 flex gap-2">
+                    <Button
+                      variant="secondary"
+                      onClick={() => notify("Xabarlar tez orada mavjud bo'ladi")}
+                      className="h-10 flex-1 text-sm"
+                    >
+                      <MessageSquare size={14} /> Chat
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => notify(`${o.provider} bilan qo'ng'iroq: tez orada mavjud bo'ladi`)}
+                      className="h-10 flex-1 text-sm"
+                    >
+                      <Phone size={14} /> Qo'ng'iroq
+                    </Button>
+                  </div>
                   <button
                     onClick={() => {
                       cancelOrder(o.id);
