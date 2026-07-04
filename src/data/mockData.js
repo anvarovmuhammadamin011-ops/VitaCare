@@ -329,7 +329,10 @@ export const drugs = [
   { id: "d8", name: "Sovuqotish sirupi", category: "Sovuqotish", price: 28000, pack: "100 ml" },
 ];
 
-export const PHARMACY_COMMISSION_RATE = 0.05;
+// Retsept zakazlari uchun komissiya oddiy zakazlardan yuqoriroq —
+// ular ko'proq tekshiruv (hujjat, davlat reyestri) talab qiladi.
+export const PHARMACY_PRESCRIPTION_COMMISSION_RATE = 0.05;
+export const PHARMACY_PLAIN_COMMISSION_RATE = 0.03;
 
 export const deliveryFleet = ["Javohir (Motosikl)", "Akmal (Velosiped)", "Olimjon (Motosikl)"];
 

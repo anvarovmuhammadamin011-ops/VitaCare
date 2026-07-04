@@ -5,7 +5,6 @@ import {
   ChevronRight,
   ChevronDown,
   ArrowRight,
-  Bell,
   HeartPulse,
   MapPin,
   Pill as PillIcon,
@@ -13,18 +12,17 @@ import {
   Stethoscope,
 } from "lucide-react";
 import Wordmark from "../components/Wordmark";
+import NotificationBell from "../components/NotificationBell";
 import ServiceIcon from "../components/ServiceIcon";
 import ServiceDetailSheet from "../components/ServiceDetailSheet";
 import LocationSheet from "../components/LocationSheet";
 import { useCity } from "../store/CityContext";
-import { useToast } from "../store/ToastContext";
 import { useReminders } from "../store/RemindersContext";
 import { quickServices } from "../data/mockData";
 
 export default function Home() {
   const navigate = useNavigate();
   const { city } = useCity();
-  const { notify } = useToast();
   const { totalToday, takenCount } = useReminders();
   const [search, setSearch] = useState("");
   const [detailService, setDetailService] = useState(null);
@@ -41,13 +39,7 @@ export default function Home() {
       <header className="px-4 pb-2 pt-6">
         <div className="flex items-center justify-between">
           <Wordmark className="h-8 w-auto" />
-          <button
-            onClick={() => notify("Notifikatsiyalar: tez orada qo'shiladi")}
-            aria-label="Notifikatsiyalar"
-            className="grid h-9 w-9 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"
-          >
-            <Bell size={20} />
-          </button>
+          <NotificationBell />
         </div>
 
         <button

@@ -89,6 +89,7 @@ export function RemindersProvider({ children }) {
       value={{
         reminders: activeReminders,
         todayLog,
+        log,
         addReminder,
         removeReminder,
         markDose,

@@ -14,7 +14,9 @@ function initials(name) {
 export default function Doctors() {
   const navigate = useNavigate();
   const { accounts } = useAuth();
-  const doctors = accounts.filter((a) => a.role === "doktor" && a.verified !== false);
+  const doctors = accounts.filter(
+    (a) => a.role === "doktor" && a.verified !== false && a.providerKind !== "hamshira"
+  );
 
   return (
     <div className="flex flex-col gap-4 pb-6">

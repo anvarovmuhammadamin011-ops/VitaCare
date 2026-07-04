@@ -6,6 +6,7 @@ import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
 import { useDoctor } from "../store/DoctorContext";
 import { useToast } from "../store/ToastContext";
+import { useNotifications } from "../store/NotificationsContext";
 
 function formatSom(n) {
   return `${n.toLocaleString("uz-UZ")} so'm`;
@@ -22,6 +23,7 @@ export default function DoctorOrders() {
   const [tab, setTab] = useState("yangi");
   const { incoming, active, completed, cancelled, acceptOrder, rejectOrder, startTrip, completeOrder } = useDoctor();
   const { notify } = useToast();
+  const { pushNotification } = useNotifications();
 
   const listByTab = { yangi: incoming, faol: active, tugallandi: completed, "bekor qilindi": cancelled };
   const list = listByTab[tab];
@@ -92,6 +94,7 @@ export default function DoctorOrders() {
                     onClick={() => {
                       acceptOrder(o.id);
                       notify(`${o.title ?? "Buyurtma"} qabul qilindi`);
+                      pushNotification(o.patientName, "Buyurtmangiz qabul qilindi — tez orada yo'lga chiqishadi");
                     }}
                     className="h-10 flex-1 text-sm"
                   >
@@ -102,6 +105,7 @@ export default function DoctorOrders() {
                     onClick={() => {
                       rejectOrder(o.id);
                       notify(`${o.title ?? "Buyurtma"} bekor qilindi`);
+                      pushNotification(o.patientName, "Buyurtmangiz bekor qilindi");
                     }}
                     className="h-10 flex-1 text-sm"
                   >
@@ -133,6 +137,7 @@ export default function DoctorOrders() {
                       onClick={() => {
                         startTrip(o.id);
                         notify("Holat: Yo'lda deb belgilandi");
+                        pushNotification(o.patientName, "Xizmat ko'rsatuvchingiz yo'lda — tez orada yetib keladi");
                       }}
                       className="mt-2 h-10 w-full text-sm"
                     >
@@ -143,6 +148,7 @@ export default function DoctorOrders() {
                       onClick={() => {
                         completeOrder(o.id);
                         notify("Xizmat yakunlandi — daromad hisobingizga qo'shildi");
+                        pushNotification(o.patientName, "Xizmat yakunlandi — uni baholashni unutmang!");
                       }}
                       className="mt-2 h-10 w-full text-sm"
                     >
@@ -160,6 +166,7 @@ export default function DoctorOrders() {
                     ))}
                   </span>
                   {o.comment && <span className="italic text-neutral-500">"{o.comment}"</span>}
+                  {o.photo && <img src={o.photo} alt="" className="h-8 w-8 rounded-md object-cover" />}
                 </div>
               )}
 

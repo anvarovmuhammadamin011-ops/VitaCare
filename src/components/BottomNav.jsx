@@ -39,7 +39,7 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="sticky bottom-0 z-20 border-t border-neutral-100 bg-white pb-[env(safe-area-inset-bottom)]">
+    <nav className="sticky bottom-0 z-20 border-t border-neutral-100 bg-white pb-[env(safe-area-inset-bottom)] print:hidden">
       <ul className="mx-auto flex max-w-lg items-stretch justify-between px-2">
         {tabs.map((tab) => (
           <li key={tab.to} className="flex-1">

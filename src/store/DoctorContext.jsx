@@ -16,10 +16,10 @@ export function DoctorProvider({ children }) {
 
   function acceptOrder(id) {
     const order = orders.find((o) => o.id === id);
+    const displayName =
+      user?.providerKind === "hamshira" ? `${user.firstName} ${user.lastName} (Hamshira)` : `Dr. ${user?.firstName} ${user?.lastName}`;
     const claim =
-      order && !order.providerPhone && user
-        ? { provider: `Dr. ${user.firstName} ${user.lastName}`, providerPhone: user.phone }
-        : undefined;
+      order && !order.providerPhone && user ? { provider: displayName, providerPhone: user.phone } : undefined;
     acceptShared(id, claim);
   }
 

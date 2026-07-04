@@ -1,6 +1,7 @@
 import PageHeader from "../components/PageHeader";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
+import StatsPanel from "../components/StatsPanel";
 import { Check, Wallet } from "lucide-react";
 import { usePharmacy } from "../store/PharmacyContext";
 import { useToast } from "../store/ToastContext";
@@ -10,11 +11,39 @@ function formatSom(n) {
 }
 
 export default function PharmacistEarnings() {
-  const { grossEarnings, commission, netEarnings, prescriptionCompleted, plainCompleted, payouts } = usePharmacy();
+  const {
+    grossEarnings,
+    commission,
+    netEarnings,
+    completed,
+    prescriptionCompleted,
+    plainCompleted,
+    prescriptionTotal,
+    plainTotal,
+    prescriptionCommission,
+    plainCommission,
+    payouts,
+    avgRating,
+    reviewCount,
+  } = usePharmacy();
   const { notify } = useToast();
 
-  const prescriptionTotal = prescriptionCompleted.reduce((sum, o) => sum + o.total, 0);
-  const plainTotal = plainCompleted.reduce((sum, o) => sum + o.total, 0);
+  const itemCounts = completed.reduce((acc, o) => {
+    o.items.forEach((item) => {
+      acc[item.name] = (acc[item.name] ?? 0) + item.qty;
+    });
+    return acc;
+  }, {});
+  const topServiceEntry = Object.entries(itemCounts).sort((a, b) => b[1] - a[1])[0];
+  const topService = topServiceEntry ? { label: topServiceEntry[0], count: topServiceEntry[1], unit: "dona" } : null;
+
+  const nameCounts = completed.reduce((acc, o) => {
+    acc[o.patientName] = (acc[o.patientName] ?? 0) + 1;
+    return acc;
+  }, {});
+  const uniquePatients = Object.keys(nameCounts).length;
+  const repeatPatients = Object.values(nameCounts).filter((c) => c > 1).length;
+  const repeatRate = uniquePatients ? Math.round((repeatPatients / uniquePatients) * 100) : 0;
 
   return (
     <div className="flex flex-col gap-6 pb-6">
@@ -30,7 +59,7 @@ export default function PharmacistEarnings() {
           </h2>
           <dl className="mt-3 flex flex-col gap-2 text-sm">
             <Row label="Jami" value={formatSom(grossEarnings)} />
-            <Row label="Komissiya (5%)" value={`-${formatSom(commission)}`} muted />
+            <Row label="Komissiya (jami)" value={`-${formatSom(commission)}`} muted />
             <Row label="Sof pul" value={formatSom(netEarnings)} bold />
           </dl>
           <Button onClick={() => notify("To'lov so'rovi: tez orada mavjud bo'ladi")} className="mt-3 h-10 w-full text-sm">
@@ -41,15 +70,25 @@ export default function PharmacistEarnings() {
 
       <section className="px-4">
         <Card className="border-neutral-100">
-          <h2 className="text-sm font-bold text-neutral-900">Zakaz turi bo'yicha</h2>
-          <dl className="mt-3 flex flex-col gap-2 text-sm">
-            <Row label={`Oddiy zakazlar (${plainCompleted.length} ta)`} value={formatSom(plainTotal)} />
-            <Row label={`Retsept zakazlari (${prescriptionCompleted.length} ta)`} value={formatSom(prescriptionTotal)} />
+          <h2 className="text-sm font-bold text-neutral-900">Zakaz turi bo'yicha (alohida hisob)</h2>
+          <dl className="mt-4 flex flex-col gap-3 text-sm">
+            <div className="flex flex-col gap-1.5 rounded-xl border border-neutral-100 p-3">
+              <Row label={`Oddiy zakazlar (${plainCompleted.length} ta)`} value={formatSom(plainTotal)} />
+              <Row label="Komissiya (3%)" value={`-${formatSom(plainCommission)}`} muted />
+            </div>
+            <div className="flex flex-col gap-1.5 rounded-xl border border-secondary/20 bg-secondary/5 p-3">
+              <Row label={`Retsept zakazlari (${prescriptionCompleted.length} ta)`} value={formatSom(prescriptionTotal)} />
+              <Row label="Komissiya (5%)" value={`-${formatSom(prescriptionCommission)}`} muted />
+            </div>
             {plainCompleted.length + prescriptionCompleted.length === 0 && (
               <p className="text-small text-neutral-400">Hali tugallangan zakaz yo'q</p>
             )}
           </dl>
         </Card>
+      </section>
+
+      <section className="px-4">
+        <StatsPanel payouts={payouts} topService={topService} repeatRate={repeatRate} avgRating={avgRating} reviewCount={reviewCount} />
       </section>
 
       <section className="px-4">

@@ -31,11 +31,21 @@ export default function ServiceCart() {
   const provider = useMemo(() => {
     if (providerType === "hamshira") {
       const nurse = seedProviders.find((p) => p.id === providerId);
-      return nurse ? { name: nurse.name, phone: null, type: "seed", services: nurse.services } : null;
+      if (nurse) return { name: nurse.name, phone: null, type: "seed", services: nurse.services };
+
+      const decodedPhone = providerId ? decodeURIComponent(providerId) : null;
+      const acc = accounts.find(
+        (a) => a.phone === decodedPhone && a.role === "doktor" && a.providerKind === "hamshira"
+      );
+      return acc
+        ? { name: `${acc.firstName} ${acc.lastName} (Hamshira)`, phone: acc.phone, type: "real", services: null }
+        : null;
     }
     if (providerType === "doktor") {
       const decodedPhone = providerId ? decodeURIComponent(providerId) : null;
-      const acc = accounts.find((a) => a.phone === decodedPhone && a.role === "doktor");
+      const acc = accounts.find(
+        (a) => a.phone === decodedPhone && a.role === "doktor" && a.providerKind !== "hamshira"
+      );
       return acc ? { name: `Dr. ${acc.firstName} ${acc.lastName}`, phone: acc.phone, type: "real", services: null } : null;
     }
     return null;

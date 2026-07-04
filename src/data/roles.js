@@ -20,7 +20,7 @@ export const accountRoles = [
   },
 ];
 
-// Suggested chips shown when a Doktor account picks their specialization.
+// Suggested chips shown when a Doktor-role account registers as a doctor.
 export const doctorSpecialties = [
   "Terapevt",
   "Stomatolog",
@@ -30,6 +30,17 @@ export const doctorSpecialties = [
   "Nevropatolog",
   "LOR",
   "Dermatolog",
+];
+
+// Suggested chips shown when a Doktor-role account registers as a nurse.
+export const nurseSpecialties = [
+  "Umumiy hamshira",
+  "IV infuziya",
+  "Qon olish",
+  "Massaj",
+  "Fizioterapiya",
+  "Bolalar parvarishi",
+  "Post-operatsion parvarish",
 ];
 
 // Suggested chips shown when a Doktor account picks their service city.

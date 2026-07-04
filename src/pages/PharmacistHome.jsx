@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Check, ChevronRight, FileText, Loader2, MapPin, Pill as PillIcon, Star, User, Wallet } from "lucide-react";
+import { Check, ChevronRight, FileText, Loader2, MapPin, Pill as PillIcon, Star, User, Wallet } from "lucide-react";
 import Wordmark from "../components/Wordmark";
+import NotificationBell from "../components/NotificationBell";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { usePharmacy } from "../store/PharmacyContext";
 import { useAuth } from "../store/AuthContext";
 import { useToast } from "../store/ToastContext";
+import { useNotifications } from "../store/NotificationsContext";
 
 function formatSom(n) {
   return `${n.toLocaleString("uz-UZ")} so'm`;
@@ -16,6 +18,7 @@ export default function PharmacistHome() {
   const navigate = useNavigate();
   const { user, markVerified } = useAuth();
   const { notify } = useToast();
+  const { pushNotification } = useNotifications();
   const { incoming, active, completed, drugs, netEarnings, avgRating, reviewCount, acceptOrder } = usePharmacy();
 
   const verifying = user?.verified === false;
@@ -48,13 +51,7 @@ export default function PharmacistHome() {
       <header className="px-4 pb-2 pt-6">
         <div className="flex items-center justify-between">
           <Wordmark className="h-8 w-auto" />
-          <button
-            onClick={() => notify("Notifikatsiyalar: tez orada qo'shiladi")}
-            aria-label="Notifikatsiyalar"
-            className="grid h-9 w-9 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"
-          >
-            <Bell size={20} />
-          </button>
+          <NotificationBell />
         </div>
 
         <h1 className="mt-4 text-h2 font-bold text-neutral-900">Assalomu alaykum, {user?.pharmacyName ?? "Aptekachi"}! 👋</h1>
@@ -127,6 +124,7 @@ export default function PharmacistHome() {
                     onClick={() => {
                       acceptOrder(o.id);
                       notify(`#${o.id} buyurtma qabul qilindi`);
+                      pushNotification(o.patientName, `#${o.id} buyurtmangiz qabul qilindi — tayyorlanmoqda`);
                     }}
                     className="h-9 px-4 text-xs"
                   >

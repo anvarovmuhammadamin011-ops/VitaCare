@@ -16,7 +16,7 @@ import Pill from "../components/ui/Pill";
 import MapPickerSheet from "../components/MapPickerSheet";
 import { useToast } from "../store/ToastContext";
 import { useAuth } from "../store/AuthContext";
-import { accountRoles, doctorSpecialties, majorCities } from "../data/roles";
+import { accountRoles, doctorSpecialties, nurseSpecialties, majorCities } from "../data/roles";
 import { PHONE_PREFIX, formatPhoneLocal } from "../utils/phone";
 
 const roleIcons = { Pill: PillIcon, Stethoscope, UserRound };
@@ -40,6 +40,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState(null);
+  const [providerKind, setProviderKind] = useState(null);
   const [specialty, setSpecialty] = useState("");
   const [experienceYears, setExperienceYears] = useState("");
   const [serviceCity, setServiceCity] = useState("");
@@ -80,6 +81,10 @@ export default function Register() {
       notify("Yo'nalishni tanlang: Foydalanuvchi, Aptekachi yoki Doktor");
       return;
     }
+    if (role === "doktor" && !providerKind) {
+      notify("Doktormisiz yoki hamshiramisiz — tanlang");
+      return;
+    }
     if (role === "doktor" && !specialty.trim()) {
       notify("Yo'nalishingizni kiriting, masalan: Stomatolog");
       return;
@@ -99,6 +104,7 @@ export default function Register() {
     const extra =
       role === "doktor"
         ? {
+            providerKind,
             specialty: specialty.trim(),
             experienceYears: Number(experienceYears),
             serviceCity,
@@ -256,15 +262,41 @@ export default function Register() {
           {role === "doktor" && (
             <>
               <div>
+                <label className={labelClass}>Doktormisiz yoki hamshiramisiz?</label>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {[
+                    { id: "doktor", label: "Doktor" },
+                    { id: "hamshira", label: "Hamshira" },
+                  ].map((k) => (
+                    <button
+                      key={k.id}
+                      type="button"
+                      onClick={() => {
+                        setProviderKind(k.id);
+                        setSpecialty("");
+                      }}
+                      className={`h-11 rounded-xl border text-sm font-semibold transition ${
+                        providerKind === k.id
+                          ? "border-primary bg-primary/10 text-primary-dark"
+                          : "border-neutral-200 text-neutral-600 hover:border-neutral-300"
+                      }`}
+                    >
+                      {k.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
                 <label className={labelClass}>Yo'nalishingiz</label>
                 <input
                   value={specialty}
                   onChange={(e) => setSpecialty(e.target.value)}
-                  placeholder="Masalan: Stomatolog"
+                  placeholder={providerKind === "hamshira" ? "Masalan: Umumiy hamshira" : "Masalan: Stomatolog"}
                   className={inputClass}
                 />
                 <div className="no-scrollbar mt-2 flex gap-2 overflow-x-auto pb-1">
-                  {doctorSpecialties.map((s) => (
+                  {(providerKind === "hamshira" ? nurseSpecialties : doctorSpecialties).map((s) => (
                     <Pill key={s} active={specialty === s} onClick={() => setSpecialty(s)} type="button">
                       {s}
                     </Pill>

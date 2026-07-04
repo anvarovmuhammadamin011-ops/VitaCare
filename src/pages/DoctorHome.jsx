@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Check, ChevronRight, Loader2, Star, User, Wallet } from "lucide-react";
+import { Check, ChevronRight, Loader2, Star, User, Wallet } from "lucide-react";
 import Wordmark from "../components/Wordmark";
+import NotificationBell from "../components/NotificationBell";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { useDoctor } from "../store/DoctorContext";
 import { useAuth } from "../store/AuthContext";
 import { useToast } from "../store/ToastContext";
+import { useNotifications } from "../store/NotificationsContext";
 
 function formatSom(n) {
   return `${n.toLocaleString("uz-UZ")} so'm`;
@@ -16,6 +18,7 @@ export default function DoctorHome() {
   const navigate = useNavigate();
   const { user, markVerified } = useAuth();
   const { notify } = useToast();
+  const { pushNotification } = useNotifications();
   const { incoming, active, completed, netEarnings, avgRating, reviewCount, acceptOrder } = useDoctor();
 
   const verifying = user?.verified === false;
@@ -48,13 +51,7 @@ export default function DoctorHome() {
       <header className="px-4 pb-2 pt-6">
         <div className="flex items-center justify-between">
           <Wordmark className="h-8 w-auto" />
-          <button
-            onClick={() => notify("Notifikatsiyalar: tez orada qo'shiladi")}
-            aria-label="Notifikatsiyalar"
-            className="grid h-9 w-9 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"
-          >
-            <Bell size={20} />
-          </button>
+          <NotificationBell />
         </div>
 
         <h1 className="mt-4 text-h2 font-bold text-neutral-900">Assalomu alaykum, Dr. {user?.lastName}! 👋</h1>
@@ -116,6 +113,7 @@ export default function DoctorHome() {
                     onClick={() => {
                       acceptOrder(o.id);
                       notify(`${o.title ?? "Buyurtma"} qabul qilindi`);
+                      pushNotification(o.patientName, `Buyurtmangiz qabul qilindi — tez orada yo'lga chiqishadi`);
                     }}
                     className="h-9 px-4 text-xs"
                   >

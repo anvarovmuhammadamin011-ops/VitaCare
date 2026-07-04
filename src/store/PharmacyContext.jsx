@@ -1,6 +1,12 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { loadState, saveState } from "./storage";
-import { seedPharmacyOrders, seedPharmacyPayouts, PHARMACY_COMMISSION_RATE, deliveryFleet } from "../data/mockData";
+import {
+  seedPharmacyOrders,
+  seedPharmacyPayouts,
+  PHARMACY_PRESCRIPTION_COMMISSION_RATE,
+  PHARMACY_PLAIN_COMMISSION_RATE,
+  deliveryFleet,
+} from "../data/mockData";
 
 const ORDERS_KEY = "vitacare.pharmacyOrders";
 const DRUGS_KEY = "vitacare.pharmacyDrugs";
@@ -57,10 +63,15 @@ export function PharmacyProvider({ children }) {
     const deliveryBoy = deliveryFleet[Math.floor(Math.random() * deliveryFleet.length)];
     const eta = `${10 + Math.floor(Math.random() * 20)} minut`;
     setOrders((cur) => cur.map((o) => (o.id === id ? { ...o, status: "yolda", deliveryBoy, eta } : o)));
+    return { deliveryBoy, eta };
   }
 
   function deliverOrder(id) {
     setOrders((cur) => cur.map((o) => (o.id === id ? { ...o, status: "tugallandi" } : o)));
+  }
+
+  function replyToOrder(id, reply) {
+    setOrders((cur) => cur.map((o) => (o.id === id ? { ...o, providerReply: reply } : o)));
   }
 
   function addDrug(drug) {
@@ -78,12 +89,19 @@ export function PharmacyProvider({ children }) {
   const completed = orders.filter((o) => o.status === "tugallandi");
   const cancelled = orders.filter((o) => o.status === "bekor qilindi");
 
-  const grossEarnings = completed.reduce((sum, o) => sum + o.total, 0);
-  const commission = Math.round(grossEarnings * PHARMACY_COMMISSION_RATE);
-  const netEarnings = grossEarnings - commission;
-
   const prescriptionCompleted = completed.filter((o) => o.hasPrescription);
   const plainCompleted = completed.filter((o) => !o.hasPrescription);
+
+  // Retsept va oddiy zakazlar uchun komissiya alohida stavkada hisoblanadi va
+  // oylik hisobotda alohida ko'rsatiladi (PharmacistEarnings.jsx).
+  const prescriptionTotal = prescriptionCompleted.reduce((sum, o) => sum + o.total, 0);
+  const plainTotal = plainCompleted.reduce((sum, o) => sum + o.total, 0);
+  const prescriptionCommission = Math.round(prescriptionTotal * PHARMACY_PRESCRIPTION_COMMISSION_RATE);
+  const plainCommission = Math.round(plainTotal * PHARMACY_PLAIN_COMMISSION_RATE);
+
+  const grossEarnings = prescriptionTotal + plainTotal;
+  const commission = prescriptionCommission + plainCommission;
+  const netEarnings = grossEarnings - commission;
 
   const reviewed = completed.filter((o) => o.rating);
   const avgRating = reviewed.length
@@ -103,6 +121,7 @@ export function PharmacyProvider({ children }) {
         rejectOrder,
         dispatchOrder,
         deliverOrder,
+        replyToOrder,
         drugs,
         addDrug,
         removeDrug,
@@ -111,6 +130,10 @@ export function PharmacyProvider({ children }) {
         netEarnings,
         prescriptionCompleted,
         plainCompleted,
+        prescriptionTotal,
+        plainTotal,
+        prescriptionCommission,
+        plainCommission,
         avgRating,
         reviewCount: reviewed.length,
         payouts: seedPharmacyPayouts,

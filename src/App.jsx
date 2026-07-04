@@ -2,9 +2,12 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import AppLayout from "./layouts/AppLayout";
 import Home from "./pages/Home";
 import Orders from "./pages/Orders";
-import Profile from "./pages/Profile";
+import PatientProfile from "./pages/profile/PatientProfile";
+import DoctorProfile from "./pages/profile/DoctorProfile";
+import PharmacistProfile from "./pages/profile/PharmacistProfile";
 import Reimbursement from "./pages/Reimbursement";
 import Reminders from "./pages/Reminders";
+import HealthHistory from "./pages/HealthHistory";
 import Services from "./pages/Services";
 import Booking from "./pages/Booking";
 import ServiceCart from "./pages/ServiceCart";
@@ -28,6 +31,11 @@ import { PharmacyProvider } from "./store/PharmacyContext";
 import { DoctorProvider } from "./store/DoctorContext";
 import { ToastProvider } from "./store/ToastContext";
 import { RemindersProvider } from "./store/RemindersContext";
+import { NotificationsProvider } from "./store/NotificationsContext";
+import { SettingsProvider } from "./store/SettingsContext";
+import { ActivityLogProvider } from "./store/ActivityLogContext";
+import { PatientHealthProvider } from "./store/PatientHealthContext";
+import { ProviderProfileProvider } from "./store/ProviderProfileContext";
 
 function Gate() {
   const { user } = useAuth();
@@ -51,7 +59,7 @@ function Gate() {
           <Route path="/buyurtmalar" element={<PharmacistOrders />} />
           <Route path="/dorilar" element={<PharmacistDrugs />} />
           <Route path="/pul" element={<PharmacistEarnings />} />
-          <Route path="/profil" element={<Profile />} />
+          <Route path="/profil" element={<PharmacistProfile />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -65,7 +73,7 @@ function Gate() {
           <Route path="/" element={<DoctorHome />} />
           <Route path="/buyurtmalar" element={<DoctorOrders />} />
           <Route path="/pul" element={<DoctorEarnings />} />
-          <Route path="/profil" element={<Profile />} />
+          <Route path="/profil" element={<DoctorProfile />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -84,9 +92,10 @@ function Gate() {
         <Route path="/doktorlar" element={<Doctors />} />
         <Route path="/dorixona" element={<PharmacyOrder />} />
         <Route path="/buyurtmalar" element={<Orders />} />
-        <Route path="/profil" element={<Profile />} />
+        <Route path="/profil" element={<PatientProfile />} />
         <Route path="/reimbursatsiya" element={<Reimbursement />} />
         <Route path="/eslatmalar" element={<Reminders />} />
+        <Route path="/sogligim-tarixi" element={<HealthHistory />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -101,11 +110,21 @@ export default function App() {
           <PharmacyProvider>
             <DoctorProvider>
               <ToastProvider>
-                <RemindersProvider>
-                  <BrowserRouter>
-                    <Gate />
-                  </BrowserRouter>
-                </RemindersProvider>
+                <NotificationsProvider>
+                  <SettingsProvider>
+                    <ActivityLogProvider>
+                      <PatientHealthProvider>
+                        <ProviderProfileProvider>
+                          <RemindersProvider>
+                            <BrowserRouter>
+                              <Gate />
+                            </BrowserRouter>
+                          </RemindersProvider>
+                        </ProviderProfileProvider>
+                      </PatientHealthProvider>
+                    </ActivityLogProvider>
+                  </SettingsProvider>
+                </NotificationsProvider>
               </ToastProvider>
             </DoctorProvider>
           </PharmacyProvider>

@@ -1,6 +1,7 @@
 import PageHeader from "../components/PageHeader";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
+import StatsPanel from "../components/StatsPanel";
 import { Check, Wallet } from "lucide-react";
 import { useDoctor } from "../store/DoctorContext";
 import { useToast } from "../store/ToastContext";
@@ -10,7 +11,7 @@ function formatSom(n) {
 }
 
 export default function DoctorEarnings() {
-  const { grossEarnings, commission, netEarnings, completed, payouts } = useDoctor();
+  const { grossEarnings, commission, netEarnings, completed, payouts, avgRating, reviewCount } = useDoctor();
   const { notify } = useToast();
 
   const byService = completed.reduce((acc, o) => {
@@ -20,6 +21,17 @@ export default function DoctorEarnings() {
     acc[label].total += o.price;
     return acc;
   }, {});
+
+  const topServiceEntry = Object.entries(byService).sort((a, b) => b[1].count - a[1].count)[0];
+  const topService = topServiceEntry ? { label: topServiceEntry[0], count: topServiceEntry[1].count } : null;
+
+  const nameCounts = completed.reduce((acc, o) => {
+    acc[o.patientName] = (acc[o.patientName] ?? 0) + 1;
+    return acc;
+  }, {});
+  const uniquePatients = Object.keys(nameCounts).length;
+  const repeatPatients = Object.values(nameCounts).filter((c) => c > 1).length;
+  const repeatRate = uniquePatients ? Math.round((repeatPatients / uniquePatients) * 100) : 0;
 
   return (
     <div className="flex flex-col gap-6 pb-6">
@@ -56,6 +68,10 @@ export default function DoctorEarnings() {
             )}
           </dl>
         </Card>
+      </section>
+
+      <section className="px-4">
+        <StatsPanel payouts={payouts} topService={topService} repeatRate={repeatRate} avgRating={avgRating} reviewCount={reviewCount} />
       </section>
 
       <section className="px-4">

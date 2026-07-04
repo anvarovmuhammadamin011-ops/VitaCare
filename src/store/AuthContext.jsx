@@ -107,6 +107,38 @@ export function AuthProvider({ children }) {
     setAccounts((cur) => cur.map((a) => (a.phone === sessionPhone ? { ...a, verified: true } : a)));
   }
 
+  function updateProfile(patch) {
+    setAccounts((cur) => cur.map((a) => (a.phone === sessionPhone ? { ...a, ...patch } : a)));
+  }
+
+  // Account deletion has a 72h grace period during which the user can still cancel it —
+  // enforced by the interval effect below rather than deleting immediately.
+  function requestAccountDeletion() {
+    setAccounts((cur) =>
+      cur.map((a) => (a.phone === sessionPhone ? { ...a, deletionRequestedAt: Date.now() } : a))
+    );
+  }
+
+  function cancelAccountDeletion() {
+    setAccounts((cur) =>
+      cur.map((a) => (a.phone === sessionPhone ? { ...a, deletionRequestedAt: undefined } : a))
+    );
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const expired = accounts.filter(
+        (a) => a.deletionRequestedAt && now - a.deletionRequestedAt >= 72 * 60 * 60 * 1000
+      );
+      if (!expired.length) return;
+      const expiredPhones = new Set(expired.map((a) => a.phone));
+      setAccounts((cur) => cur.filter((a) => !expiredPhones.has(a.phone)));
+      if (sessionPhone && expiredPhones.has(sessionPhone)) setSessionPhone(null);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [accounts, sessionPhone]);
+
   function quickLogin(role) {
     const template = DEMO_ACCOUNTS[role];
     if (!template) return;
@@ -129,6 +161,9 @@ export function AuthProvider({ children }) {
         verifyOtp,
         cancelRegistration,
         markVerified,
+        updateProfile,
+        requestAccountDeletion,
+        cancelAccountDeletion,
         quickLogin,
       }}
     >

@@ -52,17 +52,27 @@ export function OrdersProvider({ children }) {
   }, []);
 
   function addOrder(order) {
-    const created = { id: nextId(), status: "yangi", ...order };
+    const created = { id: nextId(), status: "yangi", createdAt: Date.now(), ...order };
     setOrders((cur) => [created, ...cur]);
     return created;
+  }
+
+  // Free cancellation within 24h of booking, per the platform's cancellation policy.
+  // Orders without a createdAt (seed/demo data) are treated as outside the window.
+  function canFreeCancel(order) {
+    return Boolean(order?.createdAt && Date.now() - order.createdAt <= 24 * 60 * 60 * 1000);
   }
 
   function cancelOrder(id, reason = "Foydalanuvchi tomonidan bekor qilindi") {
     setOrders((cur) => cur.map((o) => (o.id === id ? { ...o, status: "bekor qilindi", reason } : o)));
   }
 
-  function rateOrder(id, rating) {
-    setOrders((cur) => cur.map((o) => (o.id === id ? { ...o, rating } : o)));
+  function rateOrder(id, rating, extra = {}) {
+    setOrders((cur) => cur.map((o) => (o.id === id ? { ...o, rating, ...extra } : o)));
+  }
+
+  function replyToOrder(id, reply) {
+    setOrders((cur) => cur.map((o) => (o.id === id ? { ...o, providerReply: reply } : o)));
   }
 
   // Provider-side lifecycle. Most requests already have a provider chosen by the
@@ -104,7 +114,9 @@ export function OrdersProvider({ children }) {
         cancelled,
         addOrder,
         cancelOrder,
+        canFreeCancel,
         rateOrder,
+        replyToOrder,
         acceptOrder,
         rejectOrder,
         startTrip,

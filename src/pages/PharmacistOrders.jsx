@@ -6,6 +6,7 @@ import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
 import { usePharmacy } from "../store/PharmacyContext";
 import { useToast } from "../store/ToastContext";
+import { useNotifications } from "../store/NotificationsContext";
 
 function formatSom(n) {
   return `${n.toLocaleString("uz-UZ")} so'm`;
@@ -22,6 +23,7 @@ export default function PharmacistOrders() {
   const [tab, setTab] = useState("yangi");
   const { incoming, active, completed, cancelled, acceptOrder, rejectOrder, dispatchOrder, deliverOrder } = usePharmacy();
   const { notify } = useToast();
+  const { pushNotification } = useNotifications();
 
   const listByTab = { yangi: incoming, faol: active, tugallandi: completed, "bekor qilindi": cancelled };
   const list = listByTab[tab];
@@ -104,6 +106,7 @@ export default function PharmacistOrders() {
                     onClick={() => {
                       acceptOrder(o.id);
                       notify(`#${o.id} buyurtma qabul qilindi`);
+                      pushNotification(o.patientName, `#${o.id} buyurtmangiz qabul qilindi — tayyorlanmoqda`);
                     }}
                     className="h-10 flex-1 text-sm"
                   >
@@ -114,6 +117,7 @@ export default function PharmacistOrders() {
                     onClick={() => {
                       rejectOrder(o.id);
                       notify(`#${o.id} buyurtma bekor qilindi`);
+                      pushNotification(o.patientName, `#${o.id} buyurtmangiz bekor qilindi`);
                     }}
                     className="h-10 flex-1 text-sm"
                   >
@@ -143,8 +147,9 @@ export default function PharmacistOrders() {
                   {o.status === "tayyorlanmoqda" ? (
                     <Button
                       onClick={() => {
-                        dispatchOrder(o.id);
+                        const { deliveryBoy, eta } = dispatchOrder(o.id);
                         notify("Tayyorlash tugallandi — delivery yubordi");
+                        pushNotification(o.patientName, `${deliveryBoy} yo'lda — ${eta} qoldi`);
                       }}
                       className="mt-2 h-10 w-full text-sm"
                     >
@@ -155,6 +160,7 @@ export default function PharmacistOrders() {
                       onClick={() => {
                         deliverOrder(o.id);
                         notify("Buyurtma yetkazib berildi — daromad hisobingizga qo'shildi");
+                        pushNotification(o.patientName, "Buyurtmangiz yetkazib berildi!");
                       }}
                       className="mt-2 h-10 w-full text-sm"
                     >
@@ -172,6 +178,7 @@ export default function PharmacistOrders() {
                     ))}
                   </span>
                   {o.comment && <span className="italic text-neutral-500">"{o.comment}"</span>}
+                  {o.photo && <img src={o.photo} alt="" className="h-8 w-8 rounded-md object-cover" />}
                 </div>
               )}
 
