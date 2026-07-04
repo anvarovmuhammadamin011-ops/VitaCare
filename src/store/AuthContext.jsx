@@ -10,6 +10,46 @@ function generateOtp() {
   return String(Math.floor(1000 + Math.random() * 9000));
 }
 
+// Temporary dev shortcut: one persistent demo account per role, so switching
+// roles while testing doesn't require registering/verifying each time.
+const DEMO_ACCOUNTS = {
+  foydalanuvchi: {
+    phone: "+998 90 000-00-01",
+    password: "demo123",
+    firstName: "Test",
+    lastName: "Foydalanuvchi",
+    age: 28,
+    role: "foydalanuvchi",
+  },
+  doktor: {
+    phone: "+998 90 000-00-02",
+    password: "demo123",
+    firstName: "Test",
+    lastName: "Doktor",
+    age: 40,
+    role: "doktor",
+    specialty: "Terapevt",
+    experienceYears: 10,
+    serviceCity: "Toshkent",
+    certificateFileName: "sertifikat.pdf",
+    bankCard: "9860 1234 5678 0002",
+    verified: true,
+  },
+  aptekachi: {
+    phone: "+998 90 000-00-03",
+    password: "demo123",
+    firstName: "Test",
+    lastName: "Aptekachi",
+    age: 35,
+    role: "aptekachi",
+    pharmacyName: "Demo Pharmacy",
+    pharmacyAddress: "Toshkent shahri, Amir Temur ko'chasi, 1-uy",
+    certificateFileName: "litsenziya.pdf",
+    bankCard: "9860 1234 5678 0003",
+    verified: true,
+  },
+};
+
 export function AuthProvider({ children }) {
   const [accounts, setAccounts] = useState(() => loadState(ACCOUNTS_KEY, []));
   const [sessionPhone, setSessionPhone] = useState(() => loadState(SESSION_KEY, null));
@@ -67,6 +107,16 @@ export function AuthProvider({ children }) {
     setAccounts((cur) => cur.map((a) => (a.phone === sessionPhone ? { ...a, verified: true } : a)));
   }
 
+  function quickLogin(role) {
+    const template = DEMO_ACCOUNTS[role];
+    if (!template) return;
+    setAccounts((cur) => {
+      if (cur.some((a) => a.phone === template.phone)) return cur;
+      return [...cur, { ...template, createdAt: new Date().toISOString() }];
+    });
+    setSessionPhone(template.phone);
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -79,6 +129,7 @@ export function AuthProvider({ children }) {
         verifyOtp,
         cancelRegistration,
         markVerified,
+        quickLogin,
       }}
     >
       {children}

@@ -16,6 +16,7 @@ import DoctorOrders from "./pages/DoctorOrders";
 import DoctorEarnings from "./pages/DoctorEarnings";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import QuickSwitch from "./pages/QuickSwitch";
 import { AuthProvider, useAuth } from "./store/AuthContext";
 import { CityProvider } from "./store/CityContext";
 import { OrdersProvider } from "./store/OrdersContext";
@@ -30,9 +31,10 @@ function Gate() {
   if (!user) {
     return (
       <Routes>
+        <Route path="/" element={<QuickSwitch />} />
         <Route path="/kirish" element={<Login />} />
         <Route path="/royxatdan-otish" element={<Register />} />
-        <Route path="*" element={<Navigate to="/kirish" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
   }

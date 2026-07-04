@@ -1,0 +1,41 @@
+import { ChevronRight, Pill, Stethoscope, UserRound } from "lucide-react";
+import Wordmark from "../components/Wordmark";
+import { useAuth } from "../store/AuthContext";
+import { accountRoles } from "../data/roles";
+
+const roleIcons = { Pill, Stethoscope, UserRound };
+
+export default function QuickSwitch() {
+  const { quickLogin } = useAuth();
+
+  return (
+    <div className="mx-auto flex min-h-svh w-full max-w-lg flex-col justify-center px-6">
+      <div className="mb-8 flex flex-col items-center gap-2">
+        <Wordmark />
+        <p className="text-small text-neutral-500">Qaysi hisob turida kirmoqchisiz?</p>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        {accountRoles.map((r) => {
+          const RoleIcon = roleIcons[r.icon];
+          return (
+            <button
+              key={r.id}
+              onClick={() => quickLogin(r.id)}
+              className="flex items-center gap-3 rounded-card border border-neutral-200 p-4 text-left transition hover:border-primary/40 hover:bg-primary/5 active:scale-[0.99]"
+            >
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary-dark">
+                <RoleIcon size={20} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold text-neutral-900">{r.label}</span>
+                <span className="block text-label text-neutral-500">{r.desc}</span>
+              </span>
+              <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
