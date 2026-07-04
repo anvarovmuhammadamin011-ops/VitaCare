@@ -57,7 +57,20 @@ export default function DoctorOrders() {
                 {o.status === "tugallandi" && <Badge tone="success">Tugallandi</Badge>}
                 {o.status === "bekor qilindi" && <Badge tone="error">Bekor qilindi</Badge>}
               </div>
-              <h3 className="mt-2 text-base font-semibold text-neutral-900">{o.title}</h3>
+              {o.items ? (
+                <ul className="mt-2 flex flex-col gap-0.5">
+                  {o.items.map((item) => (
+                    <li key={item.title} className="text-base font-semibold text-neutral-900">
+                      {item.title}{" "}
+                      <span className="text-sm font-normal text-neutral-500">
+                        · {item.duration} · {formatSom(item.price)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <h3 className="mt-2 text-base font-semibold text-neutral-900">{o.title}</h3>
+              )}
               <div className="mt-2 flex flex-col gap-1 text-sm text-neutral-600">
                 <span className="flex items-center gap-1.5">
                   <User size={14} className="text-neutral-400" /> {o.patientName} ({o.patientAge} yoshli)
@@ -78,7 +91,7 @@ export default function DoctorOrders() {
                   <Button
                     onClick={() => {
                       acceptOrder(o.id);
-                      notify(`${o.title} buyurtmasi qabul qilindi`);
+                      notify(`${o.title ?? "Buyurtma"} qabul qilindi`);
                     }}
                     className="h-10 flex-1 text-sm"
                   >
@@ -88,7 +101,7 @@ export default function DoctorOrders() {
                     variant="secondary"
                     onClick={() => {
                       rejectOrder(o.id);
-                      notify(`${o.title} buyurtmasi bekor qilindi`);
+                      notify(`${o.title ?? "Buyurtma"} bekor qilindi`);
                     }}
                     className="h-10 flex-1 text-sm"
                   >

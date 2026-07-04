@@ -1,6 +1,17 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ChevronRight, ChevronDown, ArrowRight, Bell, MapPin, Pill as PillIcon, ShieldCheck } from "lucide-react";
+import {
+  Search,
+  ChevronRight,
+  ChevronDown,
+  ArrowRight,
+  Bell,
+  HeartPulse,
+  MapPin,
+  Pill as PillIcon,
+  ShieldCheck,
+  Stethoscope,
+} from "lucide-react";
 import Wordmark from "../components/Wordmark";
 import ServiceIcon from "../components/ServiceIcon";
 import ServiceDetailSheet from "../components/ServiceDetailSheet";
@@ -51,11 +62,11 @@ export default function Home() {
         {/* Hero banner */}
         <div className="relative mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-5 text-white shadow-md">
           <div className="max-w-[62%]">
-            <h2 className="text-lg font-bold leading-snug">Hamshira xizmati endilikda bir qadam yaqin!</h2>
-            <p className="mt-1 text-small text-white/80">Tez, ishonchli va qulay</p>
+            <h2 className="text-lg font-bold leading-snug">Hamshira xizmatidan tez foydalaning!</h2>
+            <p className="mt-1 text-small text-white/80">Xizmatlarni tanlang, joyingizni belgilang</p>
             <button
-              onClick={() => navigate("/band-qilish/umumiy-hamshira")}
-              aria-label="Band qilish"
+              onClick={() => navigate("/xizmat-savati")}
+              aria-label="Tez foydalanish"
               className="mt-4 grid h-10 w-10 place-items-center rounded-full bg-white text-primary-dark transition hover:bg-white/90"
             >
               <ArrowRight size={18} />
@@ -107,6 +118,40 @@ export default function Home() {
           {filteredServices.length === 0 && (
             <p className="col-span-4 text-small text-neutral-400">Hech narsa topilmadi</p>
           )}
+        </div>
+      </section>
+
+      {/* XIZMAT TURLARI */}
+      <section className="px-4">
+        <h2 className="text-lg font-bold text-neutral-900">Xizmat turlari</h2>
+        <div className="mt-4 grid grid-cols-3 gap-3">
+          <button
+            onClick={() => navigate("/hamshiralar")}
+            className="flex flex-col items-center gap-2 rounded-card border border-neutral-200 bg-white p-4 text-center transition hover:border-primary/40 active:scale-[0.97]"
+          >
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary-dark">
+              <HeartPulse size={22} />
+            </span>
+            <span className="text-xs font-semibold text-neutral-900">Hamshiralar</span>
+          </button>
+          <button
+            onClick={() => navigate("/doktorlar")}
+            className="flex flex-col items-center gap-2 rounded-card border border-neutral-200 bg-white p-4 text-center transition hover:border-secondary/40 active:scale-[0.97]"
+          >
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-secondary/10 text-secondary">
+              <Stethoscope size={22} />
+            </span>
+            <span className="text-xs font-semibold text-neutral-900">Doktorlar</span>
+          </button>
+          <button
+            onClick={() => navigate("/dorixona")}
+            className="flex flex-col items-center gap-2 rounded-card border border-neutral-200 bg-white p-4 text-center transition hover:border-primary/40 active:scale-[0.97]"
+          >
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary-dark">
+              <PillIcon size={22} />
+            </span>
+            <span className="text-xs font-semibold text-neutral-900">Dorixona</span>
+          </button>
         </div>
       </section>
 

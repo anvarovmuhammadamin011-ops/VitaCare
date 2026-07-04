@@ -103,7 +103,8 @@ export default function DoctorHome() {
             incoming.slice(0, 3).map((o) => (
               <Card key={o.id} className="border-neutral-100">
                 <h3 className="text-sm font-semibold text-neutral-900">
-                  {o.title} <span className="font-normal text-neutral-500">#{o.id}</span>
+                  {o.items ? o.items.map((item) => item.title).join(", ") : o.title}{" "}
+                  <span className="font-normal text-neutral-500">#{o.id}</span>
                 </h3>
                 <p className="mt-1.5 flex items-center gap-1.5 text-sm text-neutral-600">
                   <User size={13} className="text-neutral-400" /> {o.patientName} ({o.patientAge} yoshli)
@@ -114,7 +115,7 @@ export default function DoctorHome() {
                   <Button
                     onClick={() => {
                       acceptOrder(o.id);
-                      notify(`${o.title} buyurtmasi qabul qilindi`);
+                      notify(`${o.title ?? "Buyurtma"} qabul qilindi`);
                     }}
                     className="h-9 px-4 text-xs"
                   >

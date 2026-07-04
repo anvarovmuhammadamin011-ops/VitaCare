@@ -17,17 +17,33 @@ export function PharmacyProvider({ children }) {
   const [drugs, setDrugs] = useState(() => loadState(DRUGS_KEY, []));
 
   // Seeded from the highest existing drug number so ids stay unique across reloads.
-  const counterRef = useRef();
-  if (counterRef.current === undefined) {
-    counterRef.current = drugs.reduce((max, d) => Math.max(max, drugNumber(d.id)), 100);
+  const drugCounterRef = useRef();
+  if (drugCounterRef.current === undefined) {
+    drugCounterRef.current = drugs.reduce((max, d) => Math.max(max, drugNumber(d.id)), 100);
   }
   function nextDrugId() {
-    counterRef.current += 1;
-    return `DRG-${counterRef.current}`;
+    drugCounterRef.current += 1;
+    return `DRG-${drugCounterRef.current}`;
+  }
+
+  // Same durability reasoning as nextDrugId — seeded from existing order ids.
+  const orderCounterRef = useRef();
+  if (orderCounterRef.current === undefined) {
+    orderCounterRef.current = orders.reduce((max, o) => Math.max(max, drugNumber(o.id)), 5000);
+  }
+  function nextOrderId() {
+    orderCounterRef.current += 1;
+    return String(orderCounterRef.current);
   }
 
   useEffect(() => saveState(ORDERS_KEY, orders), [orders]);
   useEffect(() => saveState(DRUGS_KEY, drugs), [drugs]);
+
+  function addOrder(order) {
+    const created = { id: nextOrderId(), status: "yangi", ...order };
+    setOrders((cur) => [created, ...cur]);
+    return created;
+  }
 
   function acceptOrder(id) {
     setOrders((cur) => cur.map((o) => (o.id === id ? { ...o, status: "tayyorlanmoqda" } : o)));
@@ -82,6 +98,7 @@ export function PharmacyProvider({ children }) {
         active,
         completed,
         cancelled,
+        addOrder,
         acceptOrder,
         rejectOrder,
         dispatchOrder,

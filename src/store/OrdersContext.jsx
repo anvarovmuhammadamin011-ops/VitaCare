@@ -65,10 +65,13 @@ export function OrdersProvider({ children }) {
     setOrders((cur) => cur.map((o) => (o.id === id ? { ...o, rating } : o)));
   }
 
-  // Provider-side lifecycle. The provider is chosen by the patient at booking time,
-  // so accepting just confirms the pre-assigned request rather than assigning one.
-  function acceptOrder(id) {
-    setOrders((cur) => cur.map((o) => (o.id === id ? { ...o, status: "qabul qilingan" } : o)));
+  // Provider-side lifecycle. Most requests already have a provider chosen by the
+  // patient at booking time, so accepting just confirms them. Open/unassigned
+  // requests (no provider picked) get claimed by whoever accepts first.
+  function acceptOrder(id, claim) {
+    setOrders((cur) =>
+      cur.map((o) => (o.id === id ? { ...o, status: "qabul qilingan", ...(claim ?? {}) } : o))
+    );
   }
 
   function rejectOrder(id, reason = "Doktor tomonidan bekor qilindi") {

@@ -7,15 +7,26 @@ const DoctorContext = createContext(null);
 
 export function DoctorProvider({ children }) {
   const { user } = useAuth();
-  const { orders, acceptOrder, rejectOrder, startTrip, completeOrder } = useOrders();
+  const { orders, acceptOrder: acceptShared, rejectOrder, startTrip, completeOrder } = useOrders();
 
-  // A doctor only works the requests a patient specifically addressed to them.
-  const mine = user ? orders.filter((o) => o.providerPhone === user.phone) : [];
+  // A doctor works requests specifically addressed to them, plus any open
+  // (no provider picked yet) request still up for grabs in the shared queue.
+  const targeted = user ? orders.filter((o) => o.providerPhone === user.phone) : [];
+  const openIncoming = orders.filter((o) => o.status === "yangi" && !o.providerPhone);
 
-  const incoming = mine.filter((o) => o.status === "yangi");
-  const active = mine.filter((o) => o.status === "qabul qilingan" || o.status === "yolda");
-  const completed = mine.filter((o) => o.status === "tugallandi");
-  const cancelled = mine.filter((o) => o.status === "bekor qilindi");
+  function acceptOrder(id) {
+    const order = orders.find((o) => o.id === id);
+    const claim =
+      order && !order.providerPhone && user
+        ? { provider: `Dr. ${user.firstName} ${user.lastName}`, providerPhone: user.phone }
+        : undefined;
+    acceptShared(id, claim);
+  }
+
+  const incoming = [...targeted.filter((o) => o.status === "yangi"), ...openIncoming];
+  const active = targeted.filter((o) => o.status === "qabul qilingan" || o.status === "yolda");
+  const completed = targeted.filter((o) => o.status === "tugallandi");
+  const cancelled = targeted.filter((o) => o.status === "bekor qilindi");
 
   const grossEarnings = completed.reduce((sum, o) => sum + o.price, 0);
   const commission = Math.round(grossEarnings * DOCTOR_COMMISSION_RATE);
@@ -29,7 +40,7 @@ export function DoctorProvider({ children }) {
   return (
     <DoctorContext.Provider
       value={{
-        orders: mine,
+        orders: targeted,
         incoming,
         active,
         completed,

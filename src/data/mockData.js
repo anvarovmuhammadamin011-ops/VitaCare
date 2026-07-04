@@ -10,6 +10,7 @@ export const quickServices = [
     icon: "Droplet",
     name: "Qon olish",
     price: 50000,
+    duration: "15 daqiqa",
     rating: 4.8,
     reviews: 320,
     available: 4,
@@ -20,6 +21,7 @@ export const quickServices = [
     icon: "HeartPulse",
     name: "EKG",
     price: 75000,
+    duration: "20 daqiqa",
     rating: 4.9,
     reviews: 210,
     available: 3,
@@ -30,6 +32,7 @@ export const quickServices = [
     icon: "Waves",
     name: "Ultratovush",
     price: 120000,
+    duration: "30 daqiqa",
     rating: 4.7,
     reviews: 180,
     available: 2,
@@ -40,6 +43,7 @@ export const quickServices = [
     icon: "Gauge",
     name: "Bosim o'lchash",
     price: 30000,
+    duration: "10 daqiqa",
     rating: 4.9,
     reviews: 410,
     available: 6,
@@ -50,6 +54,7 @@ export const quickServices = [
     icon: "Syringe",
     name: "Tizim ukoli",
     price: 40000,
+    duration: "15 daqiqa",
     rating: 4.6,
     reviews: 95,
     available: 5,
@@ -60,6 +65,7 @@ export const quickServices = [
     icon: "Thermometer",
     name: "Harorat o'lchash",
     price: 20000,
+    duration: "5 daqiqa",
     rating: 4.8,
     reviews: 130,
     available: 7,
@@ -70,6 +76,7 @@ export const quickServices = [
     icon: "TestTube",
     name: "Insulin in'eksiyasi",
     price: 35000,
+    duration: "10 daqiqa",
     rating: 4.7,
     reviews: 88,
     available: 3,
@@ -91,10 +98,10 @@ export const quickServices = [
 
 // Home-care / nursing services shown on the dedicated "Xizmatlar" tab.
 export const careServices = [
-  { id: "umumiy-hamshira", name: "Umumiy hamshira", price: 60000, icon: "Stethoscope" },
-  { id: "oliy-hamshira", name: "Oliy toifali hamshira", price: 90000, icon: "Award" },
-  { id: "bolalar-massaji", name: "Bolalar massaji", price: 70000, icon: "Baby" },
-  { id: "kichkintoy-muolaja", name: "Kichkintoylar uchun muolaja", price: 85000, icon: "Syringe" },
+  { id: "umumiy-hamshira", name: "Umumiy hamshira", price: 60000, duration: "1 soat", icon: "Stethoscope" },
+  { id: "oliy-hamshira", name: "Oliy toifali hamshira", price: 90000, duration: "1 soat", icon: "Award" },
+  { id: "bolalar-massaji", name: "Bolalar massaji", price: 70000, duration: "45 daqiqa", icon: "Baby" },
+  { id: "kichkintoy-muolaja", name: "Kichkintoylar uchun muolaja", price: 85000, duration: "30 daqiqa", icon: "Syringe" },
   {
     id: "ayollar-massaj",
     name: "Ayollar uchun massaj",
@@ -103,9 +110,9 @@ export const careServices = [
     maxHours: 3,
     icon: "Sparkles",
   },
-  { id: "enaga", name: "Enaga", price: 120000, icon: "HeartHandshake" },
-  { id: "bolalar-shifokori", name: "Bolalar shifokori", price: 100000, icon: "HeartPulse" },
-  { id: "tibbiy-korik", name: "Tibbiy ko'rik", price: 55000, icon: "ClipboardList" },
+  { id: "enaga", name: "Enaga", price: 120000, duration: "8 soat", icon: "HeartHandshake" },
+  { id: "bolalar-shifokori", name: "Bolalar shifokori", price: 100000, duration: "30 daqiqa", icon: "HeartPulse" },
+  { id: "tibbiy-korik", name: "Tibbiy ko'rik", price: 55000, duration: "20 daqiqa", icon: "ClipboardList" },
   {
     id: "fizioterapiya",
     name: "Fizioterapiya",
@@ -124,13 +131,14 @@ export const careServices = [
   },
 ];
 
-// Bookable nurse/doctor profiles shown when a patient picks who should serve them.
-// Real registered Doktor accounts are merged in alongside these at booking time.
+// Bookable nurse profiles shown on the "Hamshiralar" tab, each with their own service list.
+// Real registered Doktor accounts are shown separately on the "Doktorlar" tab.
 export const seedProviders = [
   {
     id: "dilyora-sultanova",
     name: "Dilyora Sultanova",
     specialty: "IV infuziya, Qon olish, Oksigen terapiya",
+    services: ["iv", "blood", "oksigen-terapiya"],
     experienceYears: 15,
     rating: 4.9,
     reviewCount: 250,
@@ -140,6 +148,7 @@ export const seedProviders = [
     id: "feruza-zainab",
     name: "Feruza Zainab",
     specialty: "Umumiy hamshira, Massaj",
+    services: ["umumiy-hamshira", "oliy-hamshira", "ayollar-massaj", "enaga"],
     experienceYears: 8,
     rating: 4.8,
     reviewCount: 180,
@@ -149,6 +158,7 @@ export const seedProviders = [
     id: "yulduz-rahimova",
     name: "Yulduz Rahimova",
     specialty: "Fizioterapiya, Insulin in'eksiyasi",
+    services: ["fizioterapiya", "insulin", "pressure", "temperature"],
     experienceYears: 6,
     rating: 4.7,
     reviewCount: 150,
@@ -303,8 +313,21 @@ export const seedPayouts = [
 
 export const DOCTOR_COMMISSION_RATE = 0.03;
 
-// Categories offered when a pharmacist adds a drug to their inventory.
+// Categories offered when a pharmacist adds a drug to their inventory, and used
+// to filter the patient-facing catalog below.
 export const drugCategories = ["Og'riq qoldiruvchi", "Antibiotik", "Vitamin", "Sovuqotish", "Boshqa"];
+
+// Catalog a patient browses on the "Dorixona" tab to place a prescription order.
+export const drugs = [
+  { id: "d1", name: "Paracetamol 500mg", category: "Og'riq qoldiruvchi", price: 12000, pack: "20 tabletka" },
+  { id: "d2", name: "Ibuprofen 200mg", category: "Og'riq qoldiruvchi", price: 18000, pack: "20 tabletka" },
+  { id: "d3", name: "Aspirin 500mg", category: "Og'riq qoldiruvchi", price: 15000, pack: "20 tabletka" },
+  { id: "d4", name: "Amoksitsillin 500mg", category: "Antibiotik", price: 25000, pack: "16 kapsula" },
+  { id: "d5", name: "Metformin 500mg", category: "Boshqa", price: 30000, pack: "30 tabletka" },
+  { id: "d6", name: "Vitamin C 1000mg", category: "Vitamin", price: 22000, pack: "30 tabletka" },
+  { id: "d7", name: "Multivitamin kompleks", category: "Vitamin", price: 35000, pack: "30 tabletka" },
+  { id: "d8", name: "Sovuqotish sirupi", category: "Sovuqotish", price: 28000, pack: "100 ml" },
+];
 
 export const PHARMACY_COMMISSION_RATE = 0.05;
 

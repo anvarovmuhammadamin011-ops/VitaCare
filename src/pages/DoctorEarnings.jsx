@@ -14,9 +14,10 @@ export default function DoctorEarnings() {
   const { notify } = useToast();
 
   const byService = completed.reduce((acc, o) => {
-    acc[o.title] = acc[o.title] ?? { count: 0, total: 0 };
-    acc[o.title].count += 1;
-    acc[o.title].total += o.price;
+    const label = o.items ? o.items.map((item) => item.title).join(" + ") : o.title;
+    acc[label] = acc[label] ?? { count: 0, total: 0 };
+    acc[label].count += 1;
+    acc[label].total += o.price;
     return acc;
   }, {});
 

@@ -55,7 +55,13 @@ export default function Profile() {
   const isDoctor = user?.role === "doktor";
 
   const reviews = isDoctor
-    ? doctorCompleted.filter((o) => o.rating).map((o) => ({ id: o.id, rating: o.rating, text: o.comment ?? o.title }))
+    ? doctorCompleted
+        .filter((o) => o.rating)
+        .map((o) => ({
+          id: o.id,
+          rating: o.rating,
+          text: o.comment ?? (o.items ? o.items.map((item) => item.title).join(", ") : o.title),
+        }))
     : isAptekachi
       ? pharmacyCompleted
           .filter((o) => o.rating)

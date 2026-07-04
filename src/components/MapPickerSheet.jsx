@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState } from "react";
-import { Check, MapPin } from "lucide-react";
+import { Check, LocateFixed, MapPin } from "lucide-react";
 import Sheet from "./ui/Sheet";
 import Button from "./ui/Button";
 import { useCity } from "../store/CityContext";
+import { useToast } from "../store/ToastContext";
 
 const streetPool = [
   "Mirobod ko'chasi",
@@ -35,7 +36,9 @@ function zoneAddress(city, x, y) {
 
 export default function MapPickerSheet({ open, onClose, onConfirm }) {
   const { city } = useCity();
+  const { notify } = useToast();
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [locating, setLocating] = useState(false);
   const dragState = useRef(null);
 
   const address = useMemo(() => zoneAddress(city, -offset.x, -offset.y), [city, offset]);
@@ -59,6 +62,28 @@ export default function MapPickerSheet({ open, onClose, onConfirm }) {
     dragState.current = null;
   }
 
+  function detectCurrentLocation() {
+    if (!navigator.geolocation) {
+      notify("Joylashuvni aniqlash bu qurilmada mavjud emas");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const x = clamp(((latitude * 9973) % (LIMIT * 2)) - LIMIT, -LIMIT, LIMIT);
+        const y = clamp(((longitude * 9973) % (LIMIT * 2)) - LIMIT, -LIMIT, LIMIT);
+        setOffset({ x: -x, y: -y });
+        setLocating(false);
+        notify("Joriy joylashuvingiz aniqlandi");
+      },
+      () => {
+        setLocating(false);
+        notify("Joylashuvga ruxsat berilmadi");
+      }
+    );
+  }
+
   function handleConfirm() {
     onConfirm(address);
     onClose();
@@ -66,6 +91,16 @@ export default function MapPickerSheet({ open, onClose, onConfirm }) {
 
   return (
     <Sheet open={open} onClose={onClose} title="Manzilni xaritadan tanlang">
+      <button
+        type="button"
+        onClick={detectCurrentLocation}
+        disabled={locating}
+        className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/5 py-2.5 text-sm font-semibold text-primary-dark transition hover:bg-primary/10 disabled:opacity-60"
+      >
+        <LocateFixed size={16} className={locating ? "animate-pulse" : ""} />
+        {locating ? "Aniqlanmoqda..." : "Joriy joylashuvimni aniqlash"}
+      </button>
+
       <div
         className="relative h-72 w-full touch-none overflow-hidden rounded-2xl bg-[#e7edf0]"
         onPointerDown={handlePointerDown}

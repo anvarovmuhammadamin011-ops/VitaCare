@@ -12,6 +12,7 @@ function reorderPayload(o, user) {
   return {
     type: o.type,
     title: o.title,
+    items: o.items,
     patientName: user ? `${user.firstName} ${user.lastName}` : o.patientName,
     patientAge: user?.age ?? o.patientAge,
     address: o.address,
@@ -23,6 +24,10 @@ function reorderPayload(o, user) {
     providerPhone: o.providerPhone ?? null,
     providerType: o.providerType,
   };
+}
+
+function orderTitle(o) {
+  return o.items ? o.items.map((item) => item.title).join(", ") : o.title;
 }
 
 function formatSom(n) {
@@ -50,7 +55,7 @@ export default function Orders() {
   function reorder(o) {
     addOrder(reorderPayload(o, user));
     setTab("aktiv");
-    notify(`${o.title} qayta buyurtma qilindi`);
+    notify(`${orderTitle(o)} qayta buyurtma qilindi`);
   }
 
   return (
@@ -87,13 +92,32 @@ export default function Orders() {
                     <span className="text-label font-medium text-neutral-400">{o.id}</span>
                     <Badge tone={badge.tone}>{badge.label}</Badge>
                   </div>
-                  <h3 className="mt-2 flex items-center gap-1.5 text-base font-semibold text-neutral-900">
-                    <Activity size={15} className="text-warning" /> {o.title}
-                  </h3>
+                  {o.items ? (
+                    <ul className="mt-2 flex flex-col gap-0.5">
+                      {o.items.map((item) => (
+                        <li key={item.title} className="text-base font-semibold text-neutral-900">
+                          {item.title}{" "}
+                          <span className="text-sm font-normal text-neutral-500">
+                            · {item.duration} · {formatSom(item.price)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <h3 className="mt-2 flex items-center gap-1.5 text-base font-semibold text-neutral-900">
+                      <Activity size={15} className="text-warning" /> {o.title}
+                    </h3>
+                  )}
                   <div className="mt-2 flex flex-col gap-1 text-sm text-neutral-600">
-                    <span className="flex items-center gap-1.5">
-                      <User size={14} className="text-neutral-400" /> {o.provider}
-                    </span>
+                    {o.provider ? (
+                      <span className="flex items-center gap-1.5">
+                        <User size={14} className="text-neutral-400" /> {o.provider}
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1.5 text-neutral-400">
+                        <User size={14} /> Xizmat ko'rsatuvchi qidirilmoqda...
+                      </span>
+                    )}
                     <span className="flex items-center gap-1.5">
                       <MapPin size={14} className="text-neutral-400" /> {o.address}
                     </span>
@@ -102,28 +126,31 @@ export default function Orders() {
                       {o.hours && ` (${o.hours} soat)`}
                     </span>
                   </div>
+                  {o.note && <p className="mt-1 text-label text-neutral-500">"{o.note}"</p>}
                   <p className="mt-2 text-base font-semibold text-neutral-900">
                     {formatSom(o.price)}{" "}
                     <span className="text-xs font-normal text-neutral-400">
                       ({o.paid ? "to'landi" : "to'lovga tayyor"})
                     </span>
                   </p>
-                  <div className="mt-3 flex gap-2">
-                    <Button
-                      variant="secondary"
-                      onClick={() => notify("Xabarlar tez orada mavjud bo'ladi")}
-                      className="h-10 flex-1 text-sm"
-                    >
-                      <MessageSquare size={14} /> Chat
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      onClick={() => notify(`${o.provider} bilan qo'ng'iroq: tez orada mavjud bo'ladi`)}
-                      className="h-10 flex-1 text-sm"
-                    >
-                      <Phone size={14} /> Qo'ng'iroq
-                    </Button>
-                  </div>
+                  {o.provider && (
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        variant="secondary"
+                        onClick={() => notify("Xabarlar tez orada mavjud bo'ladi")}
+                        className="h-10 flex-1 text-sm"
+                      >
+                        <MessageSquare size={14} /> Chat
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        onClick={() => notify(`${o.provider} bilan qo'ng'iroq: tez orada mavjud bo'ladi`)}
+                        className="h-10 flex-1 text-sm"
+                      >
+                        <Phone size={14} /> Qo'ng'iroq
+                      </Button>
+                    </div>
+                  )}
                   <button
                     onClick={() => {
                       cancelOrder(o.id);
@@ -148,9 +175,22 @@ export default function Orders() {
                   <span className="text-label font-medium text-neutral-400">{o.id}</span>
                   <Badge tone="success">Tayyor</Badge>
                 </div>
-                <h3 className="mt-2 flex items-center gap-1.5 text-base font-semibold text-neutral-900">
-                  <Activity size={15} className="text-primary" /> {o.title}
-                </h3>
+                {o.items ? (
+                  <ul className="mt-2 flex flex-col gap-0.5">
+                    {o.items.map((item) => (
+                      <li key={item.title} className="text-base font-semibold text-neutral-900">
+                        {item.title}{" "}
+                        <span className="text-sm font-normal text-neutral-500">
+                          · {item.duration} · {formatSom(item.price)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <h3 className="mt-2 flex items-center gap-1.5 text-base font-semibold text-neutral-900">
+                    <Activity size={15} className="text-primary" /> {o.title}
+                  </h3>
+                )}
                 <div className="mt-2 flex flex-col gap-1 text-sm text-neutral-600">
                   <span className="flex items-center gap-1.5">
                     <User size={14} className="text-neutral-400" /> {o.provider}
@@ -194,9 +234,19 @@ export default function Orders() {
                     <XCircle size={12} className="mr-1" /> Bekor qilindi
                   </Badge>
                 </div>
-                <h3 className="mt-2 flex items-center gap-1.5 text-base font-semibold text-neutral-900">
-                  <Activity size={15} className="text-error" /> {o.title}
-                </h3>
+                {o.items ? (
+                  <ul className="mt-2 flex flex-col gap-0.5">
+                    {o.items.map((item) => (
+                      <li key={item.title} className="text-base font-semibold text-neutral-900">
+                        {item.title}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <h3 className="mt-2 flex items-center gap-1.5 text-base font-semibold text-neutral-900">
+                    <Activity size={15} className="text-error" /> {o.title}
+                  </h3>
+                )}
                 <div className="mt-2 flex flex-col gap-1 text-sm text-neutral-600">
                   <span className="flex items-center gap-1.5">
                     <User size={14} className="text-neutral-400" /> {o.provider}

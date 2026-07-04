@@ -7,6 +7,10 @@ import Reimbursement from "./pages/Reimbursement";
 import Reminders from "./pages/Reminders";
 import Services from "./pages/Services";
 import Booking from "./pages/Booking";
+import ServiceCart from "./pages/ServiceCart";
+import Nurses from "./pages/Nurses";
+import Doctors from "./pages/Doctors";
+import PharmacyOrder from "./pages/PharmacyOrder";
 import PharmacistHome from "./pages/PharmacistHome";
 import PharmacistOrders from "./pages/PharmacistOrders";
 import PharmacistDrugs from "./pages/PharmacistDrugs";
@@ -74,6 +78,11 @@ function Gate() {
         <Route path="/" element={<Home />} />
         <Route path="/xizmatlar" element={<Services />} />
         <Route path="/band-qilish/:serviceId" element={<Booking />} />
+        <Route path="/xizmat-savati" element={<ServiceCart />} />
+        <Route path="/xizmat-savati/:providerType/:providerId" element={<ServiceCart />} />
+        <Route path="/hamshiralar" element={<Nurses />} />
+        <Route path="/doktorlar" element={<Doctors />} />
+        <Route path="/dorixona" element={<PharmacyOrder />} />
         <Route path="/buyurtmalar" element={<Orders />} />
         <Route path="/profil" element={<Profile />} />
         <Route path="/reimbursatsiya" element={<Reimbursement />} />
